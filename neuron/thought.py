@@ -11,7 +11,7 @@ class Thought:
     def serialize(self):
         msg = bytes()
         msg += struct.pack('<Q', self.user_id)
-        msg += struct.pack('<Q', round(int(self.timestamp.strftime('%s'))))
+        msg += struct.pack('<Q', int(self.timestamp.timestamp()))
         thought = self.thought.encode('utf-8')
         msg += struct.pack('<I', len(thought))
         msg += thought
