@@ -9,8 +9,8 @@ class Connection:
         local_ip, local_port = self.socket.getsockname()
         remote_ip, remote_port = self.socket.getpeername()
         return f'<{self.__class__.__name__} ' + \
-            'from {local_ip}:{local_port} ' + \
-            'to {remote_ip}:{remote_port}>'
+            f'from {local_ip}:{local_port} ' + \
+            f'to {remote_ip}:{remote_port}>'
 
     def __enter__(self):
         return self

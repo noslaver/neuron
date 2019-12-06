@@ -27,9 +27,9 @@ class Thought:
 
     def __repr__(self):
         return f'{self.__class__.__name__}' + \
-                '(user_id={self.user_id}, ' + \
-                'timestamp={self.timestamp!r}, ' + \
-                'thought={self.thought!r})'
+               f'(user_id={self.user_id}, ' + \
+               f'timestamp={self.timestamp!r}, ' + \
+               f'thought={self.thought!r})'
 
     def __str__(self):
         return f'[{self.timestamp}] user {self.user_id}: {self.thought}'

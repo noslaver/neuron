@@ -44,8 +44,7 @@ class Handler(threading.Thread):
                 return
 
             user_id, timestamp, thought_len = struct.unpack('<QQI', header)
-            thought = receive_bytes(
-                self.connection, thought_len).decode('utf-8')
+            thought = self.connection.receive(thought_len).decode('utf-8')
 
             timestamp = datetime.fromtimestamp(
                 timestamp).strftime('%Y-%m-%d_%H-%M-%S')
