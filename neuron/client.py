@@ -7,6 +7,7 @@ import time
 
 cli = CommandLineInterface()
 
+
 @cli.command
 def upload(address, user, thought):
     ip, port = address.split(':')

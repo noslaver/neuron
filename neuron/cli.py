@@ -2,6 +2,7 @@ import inspect
 from functools import wraps
 import sys
 
+
 class CommandLineInterface:
 
     def __init__(self):
@@ -22,11 +23,11 @@ class CommandLineInterface:
 
         try:
             kwargs = dict(arg.split('=') for arg in sys.argv[2:])
-        except:
+        except Exception:
             print(f'USAGE: python {sys.argv[0]} <command> [<key>=<value>]*')
             exit(1)
 
-        if not func_name in self.functions:
+        if func_name not in self.functions:
             print(f'USAGE: python {sys.argv[0]} <command> [<key>=<value>]*')
             exit(1)
 

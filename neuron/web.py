@@ -1,7 +1,5 @@
 from datetime import datetime
-import http.server
 import pathlib
-import time
 from .website import Website
 
 _INDEX_HTML = '''
@@ -42,6 +40,7 @@ _USER_HTML = '''
 website = Website()
 data_dir = None
 
+
 @website.route('/')
 def index():
     users_html = []
@@ -63,8 +62,10 @@ def user(user_id):
     for msg in user_dir.iterdir():
         timestamp = extract_timestamp(msg.name)
         thought = msg.read_text()
-        msgs_html.append(_MESSAGES_HTML.format(timestamp=timestamp, thought=thought))
-    user_html = _USER_HTML.format(user_id=user_id, messages='\n'.join(msgs_html))
+        msgs_html.append(_MESSAGES_HTML.format(
+            timestamp=timestamp, thought=thought))
+    user_html = _USER_HTML.format(
+        user_id=user_id, messages='\n'.join(msgs_html))
 
     return 200, user_html
 

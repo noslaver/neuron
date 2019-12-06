@@ -9,19 +9,19 @@ class Listener:
         self.backlog = backlog
         self.reuseaddr = reuseaddr
 
-
     def __repr__(self):
-        return f'{self.__class__.__name__}(port={self.port}, host={self.host!r}, backlog={self.backlog}, reuseaddr={self.reuseaddr})'
-
+        return f'{self.__class__.__name__}' + \
+                '(port={self.port}, ' + \
+                'host={self.host!r}, ' + \
+                'backlog={self.backlog}, ' + \
+                'reuseaddr={self.reuseaddr})'
 
     def __enter__(self):
         self.start()
         return self
 
-
     def __exit__(self, exception, error, traceback):
         self.stop()
-
 
     def start(self):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,10 +32,8 @@ class Listener:
 
         self.server = server
 
-
     def stop(self):
         self.server.close()
-
 
     def accept(self):
         client, _ = self.server.accept()

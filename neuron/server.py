@@ -2,19 +2,19 @@ from .cli import CommandLineInterface
 from .utils.listener import Listener
 from datetime import datetime
 import pathlib
-import socket
 import struct
 import threading
-import time
 
 
 cli = CommandLineInterface()
+
 
 @cli.command
 def run(address, data):
     ip, port = address.split(':')
     address = ip, int(port)
     run_server(address, data)
+
 
 def run_server(address, data_dir):
     listener = Listener(address[1], address[0], 1, True)
@@ -34,10 +34,8 @@ class Handler(threading.Thread):
         self.connection = connection
         self.data_dir = data_dir
 
-
     def run(self):
         self.handle_client()
-
 
     def handle_client(self):
         while True:
@@ -46,9 +44,11 @@ class Handler(threading.Thread):
                 return
 
             user_id, timestamp, thought_len = struct.unpack('<QQI', header)
-            thought = receive_bytes(self.connection, thought_len).decode('utf-8')
+            thought = receive_bytes(
+                self.connection, thought_len).decode('utf-8')
 
-            timestamp = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d_%H-%M-%S')
+            timestamp = datetime.fromtimestamp(
+                timestamp).strftime('%Y-%m-%d_%H-%M-%S')
 
             out_dir = pathlib.Path(self.data_dir) / str(user_id)
             out_dir.mkdir(parents=True, exist_ok=True)

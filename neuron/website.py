@@ -2,6 +2,7 @@ import http.server
 from functools import wraps
 import re
 
+
 def HandlerFactory(handlers):
     class Handler(http.server.BaseHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
@@ -25,8 +26,8 @@ def HandlerFactory(handlers):
             self.send_response(404)
             self.end_headers()
 
-
     return Handler
+
 
 class Website:
     def __init__(self):
