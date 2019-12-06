@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/noslaver/neuron.svg?branch=master)](https://travis-ci.org/noslaver/neuron)
+[![codecov](https://codecov.io/gh/noslaver/neuron/branch/master/graph/badge.svg)](https://codecov.io/gh/noslaver/neuron)
+
 # neuron
 A python Brain-Computer interface
 
