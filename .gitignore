@@ -1,3 +1,6 @@
+# VIM
+[._]*.s[a-w][a-z]
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
