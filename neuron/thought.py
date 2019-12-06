@@ -1,3 +1,4 @@
+import calendar
 from datetime import datetime
 import struct
 
@@ -11,7 +12,7 @@ class Thought:
     def serialize(self):
         msg = bytes()
         msg += struct.pack('<Q', self.user_id)
-        msg += struct.pack('<Q', int(self.timestamp.timestamp()))
+        msg += struct.pack('<Q', calendar.timegm(self.timestamp.utctimetuple()))
         thought = self.thought.encode('utf-8')
         msg += struct.pack('<I', len(thought))
         msg += thought
@@ -21,7 +22,7 @@ class Thought:
     def deserialize(cls, data):
         user_id, timestamp, thought_len = struct.unpack('<QQI', data[:20])
         thought = data[20:20 + thought_len].decode('utf-8')
-        timestamp = datetime.fromtimestamp(timestamp)
+        timestamp = datetime.utcfromtimestamp(timestamp)
 
         return Thought(user_id, timestamp, thought)
 
