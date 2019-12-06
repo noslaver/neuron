@@ -1,8 +1,8 @@
-from cli import CommandLineInterface
+from .cli import CommandLineInterface
+from .thought import Thought
 import socket
 import struct
 import time
-from thought import Thought
 
 
 cli = CommandLineInterface()

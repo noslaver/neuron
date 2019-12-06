@@ -2,7 +2,7 @@ from datetime import datetime
 import http.server
 import pathlib
 import time
-from website import Website
+from .website import Website
 
 _INDEX_HTML = '''
 <html>
