@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime
+import datetime as dt
 import struct
 
 
@@ -22,7 +22,7 @@ class Thought:
     def deserialize(cls, data):
         user_id, timestamp, thought_len = struct.unpack('<QQI', data[:20])
         thought = data[20:20 + thought_len].decode('utf-8')
-        timestamp = datetime.utcfromtimestamp(timestamp)
+        timestamp = dt.datetime.utcfromtimestamp(timestamp)
 
         return Thought(user_id, timestamp, thought)
 

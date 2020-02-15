@@ -1,18 +1,8 @@
 from .utils.listener import Listener
-import click
 from datetime import datetime
 import pathlib
 import struct
 import threading
-
-
-@click.command
-@click.argument('address')
-@click.argument('data')
-def run(address, data):
-    ip, port = address.split(':')
-    address = ip, int(port)
-    run_server(address, data)
 
 
 def run_server(address, data_dir):
