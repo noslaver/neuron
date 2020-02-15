@@ -16,6 +16,7 @@ def upload(address, user, thought):
     ip, port = address.split(':')
     address = ip, int(port)
     upload_thought(address, int(user), thought)
+    print('done')
 
 
 @cli.command()
