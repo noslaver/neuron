@@ -11,10 +11,10 @@ class Listener:
 
     def __repr__(self):
         return f'{self.__class__.__name__}' + \
-                '(port={self.port}, ' + \
-                'host={self.host!r}, ' + \
-                'backlog={self.backlog}, ' + \
-                'reuseaddr={self.reuseaddr})'
+            '(port={self.port}, ' + \
+            'host={self.host!r}, ' + \
+            'backlog={self.backlog}, ' + \
+            'reuseaddr={self.reuseaddr})'
 
     def __enter__(self):
         self.start()

@@ -40,4 +40,3 @@ def serialize_message(user_id, thought):
     msg += struct.pack('<I', len(thought))
     msg += thought
     return msg
-
