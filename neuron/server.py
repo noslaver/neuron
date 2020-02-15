@@ -1,15 +1,14 @@
-from .cli import CommandLineInterface
 from .utils.listener import Listener
+import click
 from datetime import datetime
 import pathlib
 import struct
 import threading
 
 
-cli = CommandLineInterface()
-
-
-@cli.command
+@click.command
+@click.argument('address')
+@click.argument('data')
 def run(address, data):
     ip, port = address.split(':')
     address = ip, int(port)
@@ -65,10 +64,6 @@ class Handler(threading.Thread):
             self.lock.release()
 
 
-def main(argv):
-    cli.main()
-
-
 def signal_handler(sig, frame):
     sys.exit(0)
 
@@ -77,4 +72,3 @@ if __name__ == '__main__':
     import signal
     import sys
     signal.signal(signal.SIGINT, signal_handler)
-    sys.exit(main(sys.argv))
