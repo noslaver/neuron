@@ -1,6 +1,6 @@
 from datetime import datetime
+from flask import Flask, abort
 import pathlib
-from .website import Website
 
 _INDEX_HTML = '''
 <html>
@@ -37,26 +37,26 @@ _USER_HTML = '''
 </html>
 '''
 
-website = Website()
+app = Flask(__name__)
 data_dir = None
 
 
-@website.route('/')
+@app.route('/')
 def index():
     users_html = []
     for user_dir in data_dir.iterdir():
         users_html.append(_USER_LINE_HTML.format(user_id=user_dir.name))
     index_html = _INDEX_HTML.format(users='\n'.join(users_html))
 
-    return 200, index_html
+    return index_html
 
 
-@website.route('/users/([0-9]+)')
+@app.route('/users/<int:user_id>')
 def user(user_id):
     user_dir = data_dir / str(user_id)
 
     if not user_dir.exists():
-        return 404, ''
+        abort(404)
 
     msgs_html = []
     for msg in user_dir.iterdir():
@@ -67,7 +67,7 @@ def user(user_id):
     user_html = _USER_HTML.format(
         user_id=user_id, messages='\n'.join(msgs_html))
 
-    return 200, user_html
+    return user_html
 
 
 def extract_timestamp(file_name):
@@ -78,7 +78,8 @@ def extract_timestamp(file_name):
 def run_webserver(address, data):
     global data_dir
     data_dir = pathlib.Path(data)
-    website.run(address)
+    host, port = address
+    app.run(host=host, port=port)
 
 
 def main(argv):
