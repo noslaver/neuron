@@ -28,12 +28,12 @@ class Handler(threading.Thread):
 
     def handle_client(self):
         while True:
-            header = self.connection.receive(20)
-            if len(header) == 0:
+            msg = self.connection.receive()
+            if len(msg) == 0:
                 return
 
-            user_id, timestamp, thought_len = struct.unpack('<QQI', header)
-            thought = self.connection.receive(thought_len).decode('utf-8')
+            user_id, timestamp = struct.unpack('<QQ', msg[:16])
+            thought = msg[16:]
 
             timestamp = datetime.fromtimestamp(
                 timestamp).strftime('%Y-%m-%d_%H-%M-%S')

@@ -14,14 +14,13 @@ class Thought:
         msg += struct.pack('<Q', self.user_id)
         msg += struct.pack('<Q', calendar.timegm(self.timestamp.utctimetuple()))
         thought = self.thought.encode('utf-8')
-        msg += struct.pack('<I', len(thought))
         msg += thought
         return msg
 
     @classmethod
     def deserialize(cls, data):
-        user_id, timestamp, thought_len = struct.unpack('<QQI', data[:20])
-        thought = data[20:20 + thought_len].decode('utf-8')
+        user_id, timestamp = struct.unpack('<QQ', data[:16])
+        thought = data[16:].decode('utf-8')
         timestamp = dt.datetime.utcfromtimestamp(timestamp)
 
         return Thought(user_id, timestamp, thought)

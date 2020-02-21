@@ -25,11 +25,13 @@ class Connection:
         return cls(sock)
 
     def send(self, data):
+        self.socket.send(int.to_bytes(len(data), 4, 'little'))
         self.socket.sendall(data)
 
-    def receive(self, length):
+    def receive(self):
         current_len = 0
         msg = bytes()
+        length = int.from_bytes(self.socket.recv(4), 'little')
         while current_len < length:
             remaining = length - current_len
             buff = self.socket.recv(remaining)
