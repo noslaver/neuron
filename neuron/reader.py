@@ -1,6 +1,8 @@
 import datetime as dt
 import struct
 
+from .protocol import Image, Feelings, Snapshot
+
 
 class Reader:
     def __init__(self, path):
@@ -72,41 +74,3 @@ class Reader:
 
     def read_float(self):
         return struct.unpack('f', self.sample.read(4))
-
-
-class Image:
-    def __init__(self, ty, height, width, content):
-        self.type = ty
-        self.height = height
-        self.width = width
-        self.content = content
-
-    def __str__(self):
-        return f'{self.width}x{self.height} {self.type} image'
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}: {self.type} \
-            {self.width}x{self.height}>'
-
-
-class Feelings:
-    def __init__(self, hunger, thirst, exhaustion, happiness):
-        self.hunger = hunger
-        self.thirst = thirst
-        self.exhaustion = exhaustion
-        self.happiness = happiness
-
-
-class Snapshot:
-    def __init__(self, timestamp, translation, rotation, color_image,
-                 depth_image, feelings):
-        self.timestamp = timestamp
-        self.translation = translation
-        self.rotation = rotation
-        self.color_image = color_image
-        self.depth_image = depth_image
-        self.feelings = feelings
-
-    def __str__(self):
-        return f'Snapshot from {self.timestamp} on {self.translation} / {self.rotation}, \
-            with a {self.color_image} and a {self.depth_image}.'

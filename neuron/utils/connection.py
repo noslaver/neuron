@@ -25,10 +25,30 @@ class Connection:
         return cls(sock)
 
     def send(self, data):
+        self.socket.sendall(data)
+
+    def send_message(self, data):
         self.socket.send(int.to_bytes(len(data), 4, 'little'))
         self.socket.sendall(data)
 
-    def receive(self):
+    def receive(self, length):
+        current_len = 0
+        msg = bytes()
+        while current_len < length:
+            remaining = length - current_len
+            buff = self.socket.recv(remaining)
+
+            if not buff and current_len != 0:
+                raise RuntimeError('incomplete data')
+            elif not buff and current_len == 0:
+                return msg
+
+            msg += buff
+            current_len = len(msg)
+
+        return msg
+
+    def receive_message(self):
         current_len = 0
         msg = bytes()
         length = int.from_bytes(self.socket.recv(4), 'little')
