@@ -1,5 +1,6 @@
 from .client import upload_thought
 from .server import run_server
+from .reader import Reader
 import click
 
 
@@ -26,6 +27,15 @@ def run(address, data):
     ip, port = address.split(':')
     address = ip, int(port)
     run_server(address, data)
+
+
+@cli.command()
+@click.argument('path')
+def read(path):
+    reader = Reader(path)
+    print(f'user {reader.user_id}: {reader.username}, born {reader.birthdate} ({reader.gender})')
+    for snapshot in reader:
+        print(snapshot)
 
 
 if __name__ == '__main__':
