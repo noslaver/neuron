@@ -87,3 +87,43 @@ class Hello:
             self.birthdate == other.birthdate and \
             self.username == other.username and \
             self.gender == other.gender
+
+
+class Config:
+    def __init__(self, fields):
+        self.fields = fields
+
+    def serialize(self):
+        msg = bytes()
+        msg += struct.pack('<I', len(self.fields))
+        for field in self.fields:
+            msg += struct.pack('<I', len(field))
+            f = field.encode('utf-8')
+            msg += f
+        return msg
+
+    @classmethod
+    def deserialize(cls, data):
+        fields_len = struct.unpack('<I', data[:4])[0]
+        data = data[4:]
+        fields = []
+        for i in range(fields_len):
+            field_len = struct.unpack('<I', data[:4])[0]
+            data = data[4:]
+            field = data[:field_len].decode('utf-8')
+            data = data[field_len:]
+            fields.append(field)
+
+        return Config(fields)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}' + \
+               f'(fields={self.fields!r})'
+
+    def __str__(self):
+        return f'Supported fields: {self.fields!r}'
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return set(self.fields) == set(other.fields)
