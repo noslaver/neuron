@@ -1,7 +1,8 @@
+from .parsers import Parsers
 from .protocol import Config, Hello, Snapshot
 from .utils.listener import Listener
 from datetime import datetime
-import pathlib
+from pathlib import Path
 import struct
 import threading
 
@@ -19,8 +20,7 @@ def run_server(address, data_dir):
 class Handler(threading.Thread):
     lock = threading.Lock()
 
-    # TODO
-    config = Config(['translation', 'color_image'])
+    config = Config(Parsers.parsers.keys())
 
     def __init__(self, connection, data_dir):
         super().__init__()
@@ -42,6 +42,14 @@ class Handler(threading.Thread):
         msg = self.connection.receive_message()
         snapshot = Snapshot.deserialize(msg)
         print(snapshot)
+
+        directory = Path(self.data_dir) / str(hello.user_id) / snapshot.timestamp.strftime('%Y-%m-%d_%H-%M-%S-%f')
+        directory.mkdir(parents=True, exist_ok=True)
+
+        for parser in Parsers.parsers.values():
+            parser(Parsers.parse_context(directory), snapshot)
+
+        Parsers
 
 
 def signal_handler(sig, frame):
