@@ -70,7 +70,7 @@ class Reader:
         return int.from_bytes(self.sample.read(8), 'little')
 
     def read_double(self):
-        return struct.unpack('d', self.sample.read(8))
+        return struct.unpack('d', self.sample.read(8))[0]
 
     def read_float(self):
-        return struct.unpack('f', self.sample.read(4))
+        return struct.unpack('f', self.sample.read(4))[0]

@@ -1,3 +1,4 @@
+from .protocol import Config, Hello, Snapshot
 from .utils.listener import Listener
 from datetime import datetime
 import pathlib
@@ -18,6 +19,9 @@ def run_server(address, data_dir):
 class Handler(threading.Thread):
     lock = threading.Lock()
 
+    # TODO
+    config = Config(['translation', 'color_image'])
+
     def __init__(self, connection, data_dir):
         super().__init__()
         self.connection = connection
@@ -27,31 +31,17 @@ class Handler(threading.Thread):
         self.handle_client()
 
     def handle_client(self):
-        while True:
-            msg = self.connection.receive()
-            if len(msg) == 0:
-                return
+        msg = self.connection.receive_message()
+        if len(msg) == 0:
+            return
 
-            user_id, timestamp = struct.unpack('<QQ', msg[:16])
-            thought = msg[16:]
+        hello = Hello.deserialize(msg)
 
-            timestamp = datetime.fromtimestamp(
-                timestamp).strftime('%Y-%m-%d_%H-%M-%S')
+        self.connection.send_message(self.config.serialize())
 
-            out_dir = pathlib.Path(self.data_dir) / str(user_id)
-            out_dir.mkdir(parents=True, exist_ok=True)
-
-            out_file = out_dir / f'{timestamp}.txt'
-            out_file.touch(exist_ok=True)
-
-            self.lock.acquire()
-            all_messages = out_file.read_text()
-            if len(all_messages) == 0:
-                all_messages = thought
-            else:
-                all_messages += '\n' + thought
-            out_file.write_text(all_messages)
-            self.lock.release()
+        msg = self.connection.receive_message()
+        snapshot = Snapshot.deserialize(msg)
+        print(snapshot)
 
 
 def signal_handler(sig, frame):

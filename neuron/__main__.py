@@ -1,4 +1,4 @@
-from .client import upload_thought
+from .client import upload_snapshot
 from .server import run_server
 from .reader import Reader
 import click
@@ -7,17 +7,6 @@ import click
 @click.group()
 def cli():
     pass
-
-
-@cli.command()
-@click.argument('address')
-@click.argument('user')
-@click.argument('thought')
-def upload(address, user, thought):
-    ip, port = address.split(':')
-    address = ip, int(port)
-    upload_thought(address, int(user), thought)
-    print('done')
 
 
 @cli.command()
@@ -31,11 +20,11 @@ def run(address, data):
 
 @cli.command()
 @click.argument('path')
-def read(path):
-    reader = Reader(path)
-    print(f'user {reader.user_id}: {reader.username}, born {reader.birthdate} ({reader.gender})')
-    for snapshot in reader:
-        print(snapshot)
+@click.argument('address')
+def read(path, address):
+    ip, port = address.split(':')
+    address = ip, int(port)
+    upload_snapshot(address, path)
 
 
 if __name__ == '__main__':
