@@ -1,5 +1,6 @@
 from functools import wraps
 import json
+from PIL import Image
 
 class Parsers:
     parsers = {}
@@ -35,3 +36,13 @@ def parse_translation(context, snapshot):
         x, y, z = snapshot.translation
         translation = {'x': x, 'y': y, 'z': z}
         json.dump(translation, writer)
+
+
+@parser('color_image')
+def parse_color_image(context, snapshot):
+    ci = snapshot.color_image
+    image = Image.new('RGB', (ci.width, ci.height))
+    it = iter(ci.content)
+    image.putdata(list(zip(it, it, it)))
+    path = context.directory / 'color_image.jpg'
+    image.save(path)
