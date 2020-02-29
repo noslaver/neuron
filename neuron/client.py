@@ -6,6 +6,7 @@ import requests
 def upload_snapshot(address, path):
     reader = Reader(path, 'protobuf')
 
+    server_url = f'http://{address[0]}:{address[1]}'
 
     for snapshot in reader.read():
         headers = {'Content-Type': 'application/protobuf'}
