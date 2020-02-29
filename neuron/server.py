@@ -1,4 +1,4 @@
-from .parsers import Parsers
+from .parsers import Parsers, ParseContext
 from .protobuf import neuron_pb2
 from .protocol import Config, Snapshot, Image, Feelings
 from .utils.listener import Listener
@@ -11,10 +11,12 @@ app = Flask(__name__)
 
 data_dir = None
 
+parsers = Parsers()
+parsers.load_modules('neuron/parsers')
 
 @app.route('/config', methods=['GET'])
 def config():
-    config = Config(list(Parsers.parsers.keys()))
+    config = Config(list(parsers.parsers.keys()))
 
     return config.serialize()
 
@@ -46,8 +48,8 @@ def snapshot(user_id):
     directory = Path(data_dir) / str(user_id) / snapshot.timestamp.strftime('%Y-%m-%d_%H-%M-%S-%f')
     directory.mkdir(parents=True, exist_ok=True)
 
-    for parser in Parsers.parsers.values():
-        parser(Parsers.parse_context(directory), snapshot)
+    for parser in parsers.parsers:
+        parser(ParseContext(directory), snapshot)
 
     return ('', 204)
 
