@@ -1,55 +1,62 @@
 from .parsers import Parsers
-from .protocol import Config, Hello, Snapshot
+from .protobuf import neuron_pb2
+from .protocol import Config, Snapshot, Image, Feelings
 from .utils.listener import Listener
-from datetime import datetime
+import datetime as dt
+from flask import Flask, request
 from pathlib import Path
-import struct
-import threading
 
 
-def run_server(address, data_dir):
-    listener = Listener(address[1], address[0], 1, True)
-    listener.start()
+app = Flask(__name__)
 
-    while True:
-        client = listener.accept()
-        handler = Handler(client, data_dir)
-        handler.start()
+data_dir = None
 
 
-class Handler(threading.Thread):
-    lock = threading.Lock()
+@app.route('/config', methods=['GET'])
+def config():
+    config = Config(list(Parsers.parsers.keys()))
 
-    config = Config(Parsers.parsers.keys())
+    return config.serialize()
 
-    def __init__(self, connection, data_dir):
-        super().__init__()
-        self.connection = connection
-        self.data_dir = data_dir
 
-    def run(self):
-        self.handle_client()
+@app.route('/users/<user_id>/snapshots', methods=['POST'])
+def snapshot(user_id):
+    snap = neuron_pb2.Snapshot()
+    snap.ParseFromString(request.data)
 
-    def handle_client(self):
-        msg = self.connection.receive_message()
-        if len(msg) == 0:
-            return
+    timestamp = dt.datetime.fromtimestamp(snap.datetime / 1000.0)
 
-        hello = Hello.deserialize(msg)
+    translation = snap.pose.translation
+    translation = (translation.x, translation.y, translation.z)
 
-        self.connection.send_message(self.config.serialize())
+    rotation = snap.pose.rotation
+    rotation = (rotation.x, rotation.y, rotation.z, rotation.w)
 
-        msg = self.connection.receive_message()
-        snapshot = Snapshot.deserialize(msg)
-        print(snapshot)
+    color_image = snap.color_image
+    color_image = Image('color', color_image.height, color_image.width, color_image.data)
 
-        directory = Path(self.data_dir) / str(hello.user_id) / snapshot.timestamp.strftime('%Y-%m-%d_%H-%M-%S-%f')
-        directory.mkdir(parents=True, exist_ok=True)
+    depth_image = snap.depth_image
+    depth_image = Image('depth', depth_image.height, depth_image.width, depth_image.data)
 
-        for parser in Parsers.parsers.values():
-            parser(Parsers.parse_context(directory), snapshot)
+    feelings = snap.feelings
+    feelings = Feelings(feelings.hunger, feelings.thirst, feelings.exhaustion, feelings.happiness)
 
-        Parsers
+    snapshot = Snapshot(timestamp, translation, rotation, color_image, depth_image, feelings)
+
+    directory = Path(data_dir) / str(user_id) / snapshot.timestamp.strftime('%Y-%m-%d_%H-%M-%S-%f')
+    directory.mkdir(parents=True, exist_ok=True)
+
+    for parser in Parsers.parsers.values():
+        parser(Parsers.parse_context(directory), snapshot)
+
+    return ('', 204)
+
+
+def run_server(address, directory):
+    global data_dir
+    data_dir = Path(directory)
+    host, port = address
+    app.run(host=host, port=port)
 
 
 def signal_handler(sig, frame):

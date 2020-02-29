@@ -1,7 +1,6 @@
-from .protocol import Config, Hello
 from .reader import Reader
 from .utils import Connection
-import datetime as dt
+import requests
 
 
 def upload_snapshot(address, path):
@@ -9,15 +8,7 @@ def upload_snapshot(address, path):
 
     reader.read_user_info()
 
-    hello = Hello(reader.user_id, reader.username, reader.birthdate, reader.gender)
 
     for snapshot in reader:
-        with Connection.connect(*address) as conn:
-            conn.send_message(hello.serialize())
-
-            msg = conn.receive_message()
-            config = Config.deserialize(msg)
-
-            sp = snapshot.with_fields(config.fields)
-            print(sp)
-            conn.send_message(sp.serialize())
+        headers = {'Content-Type': 'application/protobuf'}
+        response = requests.post(f'{server_url}/users/{reader.user_id}/snapshots', data=snapshot, headers=headers)
