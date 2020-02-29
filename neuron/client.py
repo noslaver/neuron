@@ -6,9 +6,7 @@ import requests
 def upload_snapshot(address, path):
     reader = Reader(path, 'protobuf')
 
-    reader.read_user_info()
 
-
-    for snapshot in reader:
+    for snapshot in reader.read():
         headers = {'Content-Type': 'application/protobuf'}
         response = requests.post(f'{server_url}/users/{reader.user_id}/snapshots', data=snapshot, headers=headers)

@@ -109,27 +109,12 @@ class Reader:
             self.fp = gzip.open(path, 'rb')
             self.parser = ProtobufParser()
 
-    def read_user_info(self):
-        try:
-            (self.user_id, self.username, self.birthdate, self.gender) = self.parser.parse_user_info(self.fp)
-        except Exception:
-            self.fp.close()
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        try:
-            snapshot = self.parser.parse_snapshot(self.fp)
-            return snapshot
-        except Exception:
-            self.fp.close()
-            raise StopIteration
-    #
-    # def read(self):
-    #     while True:
-    #         try:
-    #             snapshot = self.parser.parse_snapshot(self.fp)
-    #             yield snapshot
-    #         except Exception:
-    #             self.fp.close()
+    def read(self):
+        (self.user_id, self.username, self.birthdate, self.gender) = self.parser.parse_user_info(self.fp)
+        while True:
+            try:
+                snapshot = self.parser.parse_snapshot(self.fp)
+                yield snapshot
+            except ValueError:
+                self.fp.close()
+                break
