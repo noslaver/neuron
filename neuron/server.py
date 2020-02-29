@@ -1,6 +1,6 @@
 from .parsers import Parsers, ParseContext
 from .protobuf import neuron_pb2
-from .protocol import Config, Snapshot, Image, Feelings
+from .protocol import Snapshot, Image, Feelings
 from .utils.listener import Listener
 import datetime as dt
 from flask import Flask, request
@@ -13,12 +13,6 @@ data_dir = None
 
 parsers = Parsers()
 parsers.load_modules('neuron/parsers')
-
-@app.route('/config', methods=['GET'])
-def config():
-    config = Config(list(parsers.parsers.keys()))
-
-    return config.serialize()
 
 
 @app.route('/users/<user_id>/snapshots', methods=['POST'])
