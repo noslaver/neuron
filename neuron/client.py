@@ -9,5 +9,6 @@ def upload_snapshot(address, path):
     server_url = f'http://{address[0]}:{address[1]}'
 
     for snapshot in reader.read():
+        sp = snapshot.SerializeToString()
         headers = {'Content-Type': 'application/protobuf'}
-        response = requests.post(f'{server_url}/users/{reader.user_id}/snapshots', data=snapshot, headers=headers)
+        response = requests.post(f'{server_url}/users/{reader.user_id}/snapshots', data=sp, headers=headers)

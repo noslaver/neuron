@@ -89,7 +89,9 @@ class ProtobufParser:
         length = read_int(fp)
         data = fp.read(length)
 
-        return data
+        snap = neuron_pb2.Snapshot()
+        snap.ParseFromString(data)
+        return snap
 
 
 
