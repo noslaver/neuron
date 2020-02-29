@@ -6,7 +6,7 @@ import sys
 
 class Parsers:
     def __init__(self):
-        self.parsers = []
+        self.parsers = {}
 
     def load_modules(self, root):
         root = pathlib.Path(root).absolute()
@@ -17,11 +17,11 @@ class Parsers:
                 continue
             mod = importlib.import_module(f'{root.name}.{path.stem}', package=root.name)
 
-            funcs = [f for name, f in mod.__dict__.items() if callable(f) and name.startswith('parse')]
-            self.parsers += funcs
+            funcs = {f.field: f for name, f in mod.__dict__.items() if callable(f) and name.startswith('parse')}
+            self.parsers.update(funcs)
 
-            funcs = [c().parse for name, c in mod.__dict__.items() if inspect.isclass(c) and name.endswith('Parser')]
-            self.parsers += funcs
+            funcs = {c.field: c().parse for name, c in mod.__dict__.items() if inspect.isclass(c) and name.endswith('Parser')}
+            self.parsers.update(funcs)
 
 
 class ParseContext:
@@ -34,3 +34,10 @@ class ParseContext:
 
     def path(self, filename):
         return self.directory / filename
+
+
+def run_parser(parser, data):
+    parsers = Parsers()
+    parsers.load_modules('neuron/parsers')
+
+    parsers.parsers[parser](ParseContext('data'), data)

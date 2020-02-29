@@ -7,3 +7,5 @@ def parse_depth_image(context, snapshot):
     image = np.reshape(image.content, (image.width, image.height))
     plt.imshow(image, cmap='hot', interpolation='nearest')
     plt.savefig(context.directory / 'depth_image.png')
+
+parse_depth_image.field = 'depth_image'

@@ -34,6 +34,7 @@ class RabbitHandler:
         msg = snapshot.SerializeToString()
         self.channel.basic_publish(exchange=_SNAPSHOTS_EXCHANGE, routing_key='', body=msg)
 
+
 def publish_to_rabbit(message):
     print(message)
 
