@@ -5,6 +5,8 @@ entrypoints==0.3
 flake8==3.7.9
 Flask==1.1.1
 mccabe==0.6.1
+matplotlib==3.1.3
+numpy==1.18.1
 Pillow==7.0.0
 protobuf==3.11.3
 pycodestyle==2.5.0
