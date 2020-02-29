@@ -87,6 +87,8 @@ class ProtobufParser:
 
     def parse_snapshot(self, fp):
         length = read_int(fp)
+        if length == 0:
+            return None
         data = fp.read(length)
 
         snap = neuron_pb2.Snapshot()
@@ -129,6 +131,8 @@ class Reader:
         while True:
             try:
                 snapshot = self.parser.parse_snapshot(self.fp)
+                if snapshot == None:
+                    break
                 yield snapshot
             except ValueError:
                 self.fp.close()
