@@ -1,7 +1,7 @@
 import datetime as dt
 import struct
 
-from .protobuf import cortex_pb2
+from .protobuf import neuron_pb2
 from .protocol import Image, Feelings, Snapshot
 
 
@@ -72,7 +72,7 @@ class ProtobufParser:
     def parse_user_info(self, fp):
         length = read_int(fp)
         data = fp.read(length)
-        user = cortex_pb2.User()
+        user = neuron_pb2.User()
         user.ParseFromString(data)
 
         birthdate = dt.datetime.fromtimestamp(user.birthday)
@@ -88,7 +88,7 @@ class ProtobufParser:
     def parse_snapshot(self, fp):
         length = read_int(fp)
         data = fp.read(length)
-        snap = cortex_pb2.Snapshot()
+        snap = neuron_pb2.Snapshot()
         snap.ParseFromString(data)
 
         timestamp = dt.datetime.fromtimestamp(snap.datetime / 1000.0)
