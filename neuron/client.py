@@ -5,11 +5,12 @@ import datetime as dt
 
 
 def upload_snapshot(address, path):
-    reader = Reader(path)
+    reader = Reader(path, 'protobuf')
 
     reader.read_user_info()
 
     hello = Hello(reader.user_id, reader.username, reader.birthdate, reader.gender)
+
     for snapshot in reader:
         with Connection.connect(*address) as conn:
             conn.send_message(hello.serialize())
