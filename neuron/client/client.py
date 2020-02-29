@@ -1,12 +1,11 @@
 from .reader import Reader
-from .utils import Connection
 import requests
 
 
-def upload_snapshot(address, path):
+def upload_sample(host, port, path):
     reader = Reader(path, 'protobuf')
 
-    server_url = f'http://{address[0]}:{address[1]}'
+    server_url = f'http://{host}:{port}'
 
     for snapshot in reader.read():
         sp = snapshot.SerializeToString()

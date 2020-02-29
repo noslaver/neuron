@@ -1,8 +1,8 @@
 import datetime as dt
 import struct
 
-from .protobuf import neuron_pb2
-from .protocol import Image, Feelings, Snapshot
+from ..protobuf import neuron_pb2
+from ..protocol import Image, Feelings, Snapshot
 
 
 def read_int(fp):
@@ -93,11 +93,24 @@ class ProtobufParser:
         snap.ParseFromString(data)
         return snap
 
+        #timestamp = dt.datetime.fromtimestamp(snap.datetime / 1000.0)
 
+        #translation = snap.pose.translation
+        #translation = (translation.x, translation.y, translation.z)
 
+        #rotation = snap.pose.rotation
+        #rotation = (rotation.x, rotation.y, rotation.z, rotation.w)
 
+        #color_image = snap.color_image
+        #color_image = Image('color', color_image.height, color_image.width, color_image.data)
 
+        #depth_image = snap.depth_image
+        #depth_image = Image('depth', depth_image.height, depth_image.width, depth_image.data)
 
+        #feelings = snap.feelings
+        #feelings = Feelings(feelings.hunger, feelings.thirst, feelings.exhaustion, feelings.happiness)
+
+        #return Snapshot(timestamp, translation, rotation, color_image, depth_image, feelings)
 
 
 class Reader:
