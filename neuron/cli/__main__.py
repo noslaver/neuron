@@ -45,7 +45,8 @@ def get_snapshot(user_id, snapshot_id, host, port):
 @click.argument('result_id', type=int)
 @click.option('--host', '-h', help='server\'s IP', default='127.0.0.1')
 @click.option('--port', '-p', help='server\'s port', type=int, default=8000)
-@click.option('--save', '-s', 'path', help='save result to path', type=click.File('wb'))
+@click.option('--save', '-s', 'path', help='save result to path',
+              type=click.File('wb'))
 def get_result(user_id, snapshot_id, result_id, path, host, port):
     pass
 

@@ -26,9 +26,11 @@ class RabbitHandler:
         self.url = url
         host, port = url.split(':')
         port = int(port)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=port))
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=host, port=port))
         self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange=_SNAPSHOTS_EXCHANGE, exchange_type='topic')
+        self.channel.exchange_declare(
+            exchange=_SNAPSHOTS_EXCHANGE, exchange_type='topic')
 
     def handle(self, snapshot):
         msg = snapshot.SerializeToString()

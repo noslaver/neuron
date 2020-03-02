@@ -10,6 +10,14 @@ def upload_sample(host, port, path):
     for index, snapshot in enumerate(reader.read()):
         # TODO - use logger
         print(f'Uploading snapshot #{index + 1}')
+
         sp = snapshot.SerializeToString()
         headers = {'Content-Type': 'application/protobuf'}
-        response = requests.post(f'{server_url}/users/{reader.user_id}/snapshots', data=sp, headers=headers)
+
+        response = requests.post(
+            f'{server_url}/users/{reader.user_id}/snapshots', data=sp,
+            headers=headers)
+
+        if response.status_code != 204:
+            print('Error uploading snapshot to server')
+            exit(1)
