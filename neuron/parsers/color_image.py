@@ -12,3 +12,5 @@ class ColorImageParser:
             image.putdata(list(zip(it, it, it)))
             path = context.path('color_image.jpg')
             image.save(path)
+
+        return {'parsed_image_path': str(path)}

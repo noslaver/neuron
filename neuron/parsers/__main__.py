@@ -7,6 +7,7 @@ import uuid
 
 
 _SNAPSHOTS_EXCHANGE = 'snapshots'
+_RESULTS_EXCHANGE = 'results'
 
 
 @click.group()
@@ -18,7 +19,8 @@ def cli():
 @click.argument('parser', type=str)
 @click.argument('data', type=click.File('rb'))
 def command_parse(parser, data):
-    res = run_parser(parser, data)
+    snapshot = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+    res = run_parser(parser, snapshot)
     print(res)
 
 
@@ -36,12 +38,16 @@ def command_run_parser(parser, msgqueue_url):
         res = channel.queue_declare(queue=f'parser_{parser}_{uuid.uuid1()}', auto_delete=True)
         queue = res.method.queue
         channel.queue_bind(exchange=_SNAPSHOTS_EXCHANGE, queue=queue, routing_key='#')
+        channel.exchange_declare(exchange=_RESULTS_EXCHANGE, exchange_type='topic')
 
         for _, _, body in channel.consume(queue):
             try:
                 snapshot = json.loads(
                         body, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-                run_parser(parser, snapshot)
+                res = run_parser(parser, snapshot)
+
+                msg = json.dumps(res)
+                channel.basic_publish(exchange=_RESULTS_EXCHANGE, routing_key=parser, body=msg)
             except Exception:
                 print('Failed to parse data')
                 break
