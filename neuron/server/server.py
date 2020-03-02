@@ -1,5 +1,4 @@
 from ..protobuf import neuron_pb2
-from ..protocol import Snapshot, Image, Feelings, Pose
 import datetime as dt
 from flask import Flask, request
 from pathlib import Path
