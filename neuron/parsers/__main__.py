@@ -40,7 +40,7 @@ def command_run_parser(parser, msgqueue_url):
         channel.queue_bind(exchange=_SNAPSHOTS_EXCHANGE, queue=queue, routing_key='#')
         channel.exchange_declare(exchange=_RESULTS_EXCHANGE, exchange_type='topic')
 
-        for _, _, body in channel.consume(queue):
+        for _, _, body in channel.consume(queue, auto_ack=True):
             try:
                 snapshot = json.loads(
                         body, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))

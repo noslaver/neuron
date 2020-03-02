@@ -13,8 +13,11 @@ _RAW_DIR = 'raw'
 
 @app.route('/users/<user_id>/snapshots', methods=['POST'])
 def snapshot(user_id):
-    snap = neuron_pb2.Snapshot()
-    snap.ParseFromString(request.data)
+    data = neuron_pb2.SnapshotInfo()
+    data.ParseFromString(request.data)
+
+    snap = data.snapshot
+    user = data.user
 
     color_image = snap.color_image
     depth_image = snap.depth_image
@@ -42,8 +45,20 @@ def snapshot(user_id):
 
     feelings = snap.feelings
 
+    if user.gender == 0:
+        gender = 'Male'
+    if user.gender == 1:
+        gender = 'Female'
+    if user.gender == 2:
+        gender = 'Other'
+
     snapshot = {
-                'user_id': user_id, #TODO - entire user
+                'user': {
+                    'id': user_id,
+                    'name': user.username,
+                    'birthday': user.birthday,
+                    'gender': user.gender
+                },
                 'timestamp': snap.datetime,
                 'pose': {
                     'translation': translation,
@@ -80,13 +95,3 @@ def run_server(host, port, publish):
     global message_handler
     message_handler = publish
     app.run(host=host, port=port)
-
-
-def signal_handler(sig, frame):
-    sys.exit(0)
-
-
-if __name__ == '__main__':
-    import signal
-    import sys
-    signal.signal(signal.SIGINT, signal_handler)

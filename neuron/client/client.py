@@ -1,3 +1,4 @@
+from ..protobuf import neuron_pb2
 from .reader import Reader
 import requests
 
@@ -11,12 +12,15 @@ def upload_sample(host, port, path):
         # TODO - use logger
         print(f'Uploading snapshot #{index + 1}')
 
-        sp = snapshot.SerializeToString()
+        request = neuron_pb2.SnapshotInfo()
+        request.snapshot.CopyFrom(snapshot)
+        request.user.CopyFrom(reader.user)
+
+        data = request.SerializeToString()
         headers = {'Content-Type': 'application/protobuf'}
 
         response = requests.post(
-            f'{server_url}/users/{reader.user_id}/snapshots', data=sp,
-            headers=headers)
+            f'{server_url}/users/{request.user.user_id}/snapshots', data=data, headers=headers)
 
         if response.status_code != 204:
             print('Error uploading snapshot to server')

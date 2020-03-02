@@ -76,15 +76,7 @@ class ProtobufParser:
         user = neuron_pb2.User()
         user.ParseFromString(data)
 
-        birthdate = dt.datetime.fromtimestamp(user.birthday)
-        if user.gender == 0:
-            gender = 'm'
-        if user.gender == 1:
-            gender = 'f'
-        if user.gender == 2:
-            gender = 'o'
-
-        return (user.user_id, user.username, birthdate, gender)
+        return user
 
     def parse_snapshot(self, fp):
         length = read_int(fp)
@@ -109,8 +101,7 @@ class Reader:
             self.parser = ProtobufParser()
 
     def read(self):
-        (self.user_id, self.username, self.birthdate, self.gender) = \
-            self.parser.parse_user_info(self.fp)
+        self.user = self.parser.parse_user_info(self.fp)
         while True:
             try:
                 snapshot = self.parser.parse_snapshot(self.fp)
