@@ -7,4 +7,5 @@ def parse_feelings(context, snapshot):
                 happiness = snapshot.feelings.happiness,
                 thirst = snapshot.feelings.thirst)
 
+
 parse_feelings.field = 'feelings'
