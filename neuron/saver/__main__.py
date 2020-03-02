@@ -1,5 +1,7 @@
-from .server import Saver
+from .saver import Saver
 import click
+from collections import namedtuple
+import json
 import pika
 import uuid
 
@@ -15,9 +17,10 @@ def cli():
 @cli.command()
 @click.argument('parser')
 @click.argument('data', type=click.File('rb'))
-@click.option('-d', '--database', 'db_url', help='database URL', default='postgresql://127.0.0.1:5432')
+@click.option('-d', '--database', 'db_url', help='database URL', default='mongodb://127.0.0.1:27017')
 def save(parser, data, db_url):
     saver = Saver(db_url)
+    data = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
     saver.save(parser, data)
 
 

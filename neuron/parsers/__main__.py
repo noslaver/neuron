@@ -21,7 +21,7 @@ def cli():
 def command_parse(parser, data):
     snapshot = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
     res = run_parser(parser, snapshot)
-    print(res)
+    print(json.dumps(res))
 
 
 @cli.command(name='run-parser')

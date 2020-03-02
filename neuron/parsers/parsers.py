@@ -53,4 +53,6 @@ def run_parser(parser, data):
     directory = pathlib.Path(_DATA_DIR) / str(user_id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
     directory.mkdir(parents=True, exist_ok=True)
 
-    return parsers.parsers[parser](ParseContext(directory), data)
+    result = parsers.parsers[parser](ParseContext(directory), data)
+
+    return {'data': result, 'metadata': { 'user_id': user_id, 'timestamp': data.timestamp }}
