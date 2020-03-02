@@ -3,6 +3,7 @@ from ..protocol import Snapshot, Image, Feelings, Pose
 import datetime as dt
 from flask import Flask, request
 from pathlib import Path
+import struct
 
 
 app = Flask(__name__)
@@ -30,7 +31,8 @@ def snapshot(user_id):
         writer.write(color_image.data)
 
     with open(depth_image_path, 'wb') as writer:
-        writer.write(color_image.data)
+        data = list(depth_image.data)
+        writer.write(struct.pack(f'{len(data)}f', *data))
 
     translation = snap.pose.translation
     translation = {'x': translation.x, 'y': translation.y, 'z': translation.z}

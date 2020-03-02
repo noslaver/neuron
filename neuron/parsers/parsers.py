@@ -55,4 +55,9 @@ def run_parser(parser, data):
 
     result = parsers.parsers[parser](ParseContext(directory), data)
 
-    return {'data': result, 'metadata': { 'user_id': user_id, 'timestamp': data.timestamp }}
+    return {
+            'data': result,
+            'metadata': {
+                'user_id': user_id,
+                'timestamp': data.timestamp
+            }}
