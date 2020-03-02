@@ -20,7 +20,7 @@ def cli():
 @click.option('-d', '--database', 'db_url', help='database URL', default='mongodb://127.0.0.1:27017')
 def save(parser, data, db_url):
     saver = Saver(db_url)
-    data = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+    data = json.load(data, object_hook=lambda d: namedtuple('NeuronStruct', d.keys())(*d.values()))
     saver.save(parser, data)
 
 

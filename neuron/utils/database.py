@@ -1,12 +1,12 @@
-from pymongo import MongoClient
+import pymongo
 
 
 class Database:
     def __init__(self, url):
         self.driver = find_driver(url)
 
-    def create_user(self, **kwargs):
-        return self.driver.create_user(**kwargs)
+    def upsert_user(self, **kwargs):
+        return self.driver.upsert_user(**kwargs)
 
     def get_user(self, **kwargs):
         user = self.driver.get_user(**kwargs)
@@ -14,30 +14,34 @@ class Database:
             raise LookupError()
         return user
 
-    def create_or_update_snapshot(self, user_id, snapshot_timestamp, **kwargs):
-        self.driver.create_or_update_snapshot(user_id, snapshot_timestamp, **kwargs)
+    def upsert_snapshot(self, user_id, snapshot_timestamp, **kwargs):
+        self.driver.upsert_snapshot(user_id, snapshot_timestamp, **kwargs)
 
 
 class MongoDriver:
     def __init__(self, url):
         self.url = url
-        self.client = MongoClient(url)
+        self.client = pymongo.MongoClient(url)
 
-    def create_user(self, user):
+        db = self.client.db
+
+        db.users.create_index([('id', pymongo.ASCENDING)],unique=True)
+        db.snapshots.create_index([('timestamp', pymongo.ASCENDING)],unique=True)
+
+    def upsert_user(self, user):
         users = self.client.db.users
-        user = {'id': user.user_id,
-                'name': user.username,
-                'gender': user.gender,
-                'birthday': user.birthday,
-                'snapshots': []}
-        users.insert_one(user)
+        user_to_insert = {'id': user.id,
+                          'name': user.name,
+                          'gender': user.gender,
+                          'birthday': user.birthday}
+        users.update({'id': user.id}, user_to_insert, upsert=True)
 
     def get_user(self, user_id):
         users = self.client.db.users
         user = users.find_one({'id': user_id})
         return user
 
-    def create_or_update_snapshot(self, user_id, snapshot_timestamp, ty, result):
+    def upsert_snapshot(self, user_id, snapshot_timestamp, ty, result):
         snapshots = self.client.db.snapshots
         # TODO - result isn't saved correctly (fields aren't named)
         snapshots.find_one_and_update({'timestamp': snapshot_timestamp},

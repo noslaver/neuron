@@ -47,10 +47,10 @@ def run_parser(parser, data):
     parsers = Parsers()
     parsers.load_modules('neuron/parsers')
 
-    user_id = data.user.id
+    user = data.user
     date = dt.datetime.fromtimestamp(data.timestamp / 1000.0)
 
-    directory = pathlib.Path(_DATA_DIR) / str(user_id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
+    directory = pathlib.Path(_DATA_DIR) / str(user.id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
     directory.mkdir(parents=True, exist_ok=True)
 
     result = parsers.parsers[parser](ParseContext(directory), data)
@@ -58,6 +58,11 @@ def run_parser(parser, data):
     return {
             'data': result,
             'metadata': {
-                'user_id': user_id,
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'birthday': user.birthday,
+                    'gender': user.gender
+                },
                 'timestamp': data.timestamp
             }}

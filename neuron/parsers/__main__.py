@@ -43,7 +43,7 @@ def command_run_parser(parser, msgqueue_url):
         for _, _, body in channel.consume(queue, auto_ack=True):
             try:
                 snapshot = json.loads(
-                        body, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+                        body, object_hook=lambda d: namedtuple('NeuronStruct', d.keys())(*d.values()))
                 res = run_parser(parser, snapshot)
 
                 msg = json.dumps(res)

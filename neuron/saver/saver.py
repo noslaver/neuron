@@ -5,7 +5,10 @@ class Saver:
         self.database = Database(db_url)
 
     def save(self, parser, result):
-        user_id = result.metadata.user_id
+        user = result.metadata.user
+
+        self.database.upsert_user(user=user)
+
         timestamp = result.metadata.timestamp
         data = result.data
-        self.database.create_or_update_snapshot(user_id, timestamp, ty=parser, result=data)
+        self.database.upsert_snapshot(user.id, timestamp, ty=parser, result=data)
