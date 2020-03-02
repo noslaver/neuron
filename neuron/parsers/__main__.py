@@ -1,5 +1,7 @@
 from .parsers import run_parser
 import click
+from collections import namedtuple
+import json
 import pika
 import uuid
 
@@ -37,13 +39,27 @@ def command_run_parser(parser, msgqueue_url):
 
         for _, _, body in channel.consume(queue):
             try:
-                run_parser(parser, body)
+                snapshot = json.loads(
+                        body, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+                run_parser(parser, snapshot)
             except Exception:
                 print('Failed to parse data')
                 break
 
         channel.close()
         connection.close()
+
+
+class Struct(object):
+    def __init__(self, data):
+        for name, value in data.iter():
+            setattr(self, name, self._wrap(value))
+
+    def _wrap(self, value):
+        if isinstance(value, (tuple, list, set, frozenset)):
+            return type(value)([self._wrap(v) for v in value])
+        else:
+            return Struct(value) if isinstance(value, dict) else value
 
 
 if __name__ == '__main__':

@@ -17,4 +17,4 @@ def run_server(host, port, api_host, api_port):
 
 
 if __name__ == '__main__':
-    cli(prog_name='neuron.api')
+    cli(prog_name='neuron.gui')

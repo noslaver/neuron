@@ -54,4 +54,4 @@ def run_saver(db_url, msgqueue_url):
 
 
 if __name__ == '__main__':
-    cli(prog_name='neuron.server')
+    cli(prog_name='neuron.saver')

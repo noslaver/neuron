@@ -1,5 +1,6 @@
 from .server import run_server as run
 import click
+import json
 import pika
 
 
@@ -33,7 +34,7 @@ class RabbitHandler:
             exchange=_SNAPSHOTS_EXCHANGE, exchange_type='topic')
 
     def handle(self, snapshot):
-        msg = snapshot.SerializeToString()
+        msg = json.dumps(snapshot)
         self.channel.basic_publish(exchange=_SNAPSHOTS_EXCHANGE, routing_key='', body=msg)
 
 

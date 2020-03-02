@@ -7,7 +7,7 @@ from pathlib import Path
 
 app = Flask(__name__)
 
-_DATA_DIR = 'data'
+_RAW_DIR = 'raw'
 
 
 @app.route('/users/<user_id>/snapshots', methods=['POST'])
@@ -15,43 +15,55 @@ def snapshot(user_id):
     snap = neuron_pb2.Snapshot()
     snap.ParseFromString(request.data)
 
-    # TODO - save binary data to disk
     color_image = snap.color_image
     depth_image = snap.depth_image
 
-    directory = Path(_DATA_DIR) / str(user_id) / \
-        snap.datetime.strftime('%Y-%m-%d_%H-%M-%S-%f')
+    date = dt.datetime.fromtimestamp(snap.datetime / 1000.0)
+
+    directory = Path(_RAW_DIR) / str(user_id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
     directory.mkdir(parents=True, exist_ok=True)
 
-    color_image_path = directory / 'color_image'
-    depth_image_path = directory / 'depth_image'
+    color_image_path = str(directory / 'color_image')
+    depth_image_path = str(directory / 'depth_image')
 
-    with open(color_image_path, 'w') as writer:
-        writer.write(color_image.content)
+    with open(color_image_path, 'wb') as writer:
+        writer.write(color_image.data)
 
-    with open(depth_image_path, 'w') as writer:
-        writer.write(color_image.content)
-
-    timestamp = dt.datetime.fromtimestamp(snap.datetime / 1000.0)
+    with open(depth_image_path, 'wb') as writer:
+        writer.write(color_image.data)
 
     translation = snap.pose.translation
-    translation = (translation.x, translation.y, translation.z)
+    translation = {'x': translation.x, 'y': translation.y, 'z': translation.z}
 
     rotation = snap.pose.rotation
-    rotation = (rotation.x, rotation.y, rotation.z, rotation.w)
-
-    pose = Pose(translation, rotation)
-
-    color_image = Image('color', color_image.height, color_image.width,
-                        color_image_path)
-    depth_image = Image('depth', depth_image.height, depth_image.width,
-                        depth_image_path)
+    rotation = {'x': rotation.x, 'y': rotation.y, 'z': rotation.z, 'w': rotation.w}
 
     feelings = snap.feelings
-    feelings = Feelings(feelings.hunger, feelings.thirst, feelings.exhaustion,
-                        feelings.happiness)
 
-    snapshot = Snapshot(timestamp, pose, color_image, depth_image, feelings)
+    snapshot = {
+                'user_id': user_id, #TODO - entire user
+                'timestamp': snap.datetime,
+                'pose': {
+                    'translation': translation,
+                    'rotation': rotation,
+                },
+                'color_image': {
+                    'height': color_image.height,
+                    'width': color_image.width,
+                    'path': color_image_path,
+                    },
+                'depth_image': {
+                    'height': depth_image.height,
+                    'width': depth_image.width,
+                    'path': depth_image_path,
+                },
+                'feelings': {
+                    'hunger': feelings.hunger,
+                    'thirst': feelings.thirst,
+                    'exhaustion': feelings.exhaustion,
+                    'happiness': feelings.happiness
+                }
+            }
 
     message_handler(snapshot)
 

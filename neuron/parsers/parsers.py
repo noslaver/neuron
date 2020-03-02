@@ -1,7 +1,11 @@
+import datetime as dt
 import importlib
 import inspect
 import pathlib
 import sys
+
+
+_DATA_DIR = 'data'
 
 
 class Parsers:
@@ -43,4 +47,10 @@ def run_parser(parser, data):
     parsers = Parsers()
     parsers.load_modules('neuron/parsers')
 
-    parsers.parsers[parser](ParseContext('data'), data)
+    user_id = data.user_id
+    date = dt.datetime.fromtimestamp(data.timestamp / 1000.0)
+
+    directory = pathlib.Path(_DATA_DIR) / str(user_id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
+    directory.mkdir(parents=True, exist_ok=True)
+
+    parsers.parsers[parser](ParseContext(directory), data)
