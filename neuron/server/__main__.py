@@ -19,6 +19,9 @@ def cli():
 def run_server(msgqueue_url, host, port):
     if msgqueue_url.startswith('rabbitmq://'):
         handler = RabbitHandler(msgqueue_url[len('rabbitmq://'):])
+    else:
+        print('Unsupported message queue type.')
+        exit(1)
     run(host, port, publish=handler.handle)
 
 
@@ -36,10 +39,6 @@ class RabbitHandler:
     def handle(self, snapshot):
         msg = json.dumps(snapshot)
         self.channel.basic_publish(exchange=_SNAPSHOTS_EXCHANGE, routing_key='', body=msg)
-
-
-def publish_to_rabbit(message):
-    print(message)
 
 
 if __name__ == '__main__':

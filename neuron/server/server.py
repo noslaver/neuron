@@ -56,7 +56,7 @@ def snapshot(user_id):
                     'id': user_id,
                     'name': user.username,
                     'birthday': user.birthday,
-                    'gender': user.gender
+                    'gender': gender
                 },
                 'timestamp': snap.datetime,
                 'pose': {

@@ -50,7 +50,8 @@ class MongoDriver:
     def get_user(self, user_id):
         users = self.client.db.users
         user = users.find_one({'id': user_id}, {'_id': False})
-        user['birthday'] = dt.datetime.fromtimestamp(user['birthday'])
+        if user is not None:
+            user['birthday'] = dt.datetime.fromtimestamp(user['birthday'])
         return user
 
     def get_users(self):
@@ -68,6 +69,9 @@ class MongoDriver:
         snapshots = self.client.db.snapshots
         snapshot = snapshots.find_one({'user_id': user_id, 'timestamp': snapshot_id},
                                        {'_id': False})
+
+        if snapshot is None:
+            return None
 
         results = [res.keys() for res in snapshot['results']]
         results = [item for sublist in results for item in sublist]
