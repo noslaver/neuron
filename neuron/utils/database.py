@@ -11,8 +11,6 @@ class Database:
 
     def get_user(self, **kwargs):
         user = self.driver.get_user(**kwargs)
-        if user is None:
-            raise LookupError()
         return user
 
     def get_users(self, **kwargs):
@@ -70,6 +68,10 @@ class MongoDriver:
         snapshots = self.client.db.snapshots
         snapshot = snapshots.find_one({'user_id': user_id, 'timestamp': snapshot_id},
                                        {'_id': False})
+
+        results = [res.keys() for res in snapshot['results']]
+        results = [item for sublist in results for item in sublist]
+        snapshot['results'] = results
         return snapshot
 
     def get_result(self, user_id, snapshot_id, result_name):
