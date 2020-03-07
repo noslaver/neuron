@@ -1,3 +1,4 @@
+import datetime as dt
 import pymongo
 
 
@@ -13,6 +14,22 @@ class Database:
         if user is None:
             raise LookupError()
         return user
+
+    def get_users(self, **kwargs):
+        users = self.driver.get_users(**kwargs)
+        return users
+
+    def get_snapshots(self, **kwargs):
+        snapshots = self.driver.get_snapshots(**kwargs)
+        return snapshots
+
+    def get_snapshot(self, **kwargs):
+        snapshot = self.driver.get_snapshot(**kwargs)
+        return snapshot
+
+    def get_result(self, **kwargs):
+        result = self.driver.get_result(**kwargs)
+        return result
 
     def upsert_snapshot(self, user_id, snapshot_timestamp, **kwargs):
         self.driver.upsert_snapshot(user_id, snapshot_timestamp, **kwargs)
@@ -30,23 +47,51 @@ class MongoDriver:
 
     def upsert_user(self, user):
         users = self.client.db.users
-        user_to_insert = {'id': user.id,
-                          'name': user.name,
-                          'gender': user.gender,
-                          'birthday': user.birthday}
-        users.update({'id': user.id}, user_to_insert, upsert=True)
+        users.update({'id': user['id']}, user, upsert=True)
 
     def get_user(self, user_id):
         users = self.client.db.users
-        user = users.find_one({'id': user_id})
+        user = users.find_one({'id': user_id}, {'_id': False})
+        user['birthday'] = dt.datetime.fromtimestamp(user['birthday'])
         return user
+
+    def get_users(self):
+        users = self.client.db.users
+        users = list(users.find({}, {'_id': False, 'id': True, 'name': True}))
+        return users
+
+    def get_snapshots(self, user_id):
+        snapshots = self.client.db.snapshots
+        snapshots = list(snapshots.find({'user_id': user_id},
+                                        {'_id': False, 'timestamp': True, 'user_id': True}))
+        return snapshots
+
+    def get_snapshot(self, user_id, snapshot_id):
+        snapshots = self.client.db.snapshots
+        snapshot = snapshots.find_one({'user_id': user_id, 'timestamp': snapshot_id},
+                                       {'_id': False})
+        return snapshot
+
+    def get_result(self, user_id, snapshot_id, result_name):
+        snapshots = self.client.db.snapshots
+        snapshot = snapshots.find_one({'user_id': user_id, 'timestamp': snapshot_id},
+                                       {'_id': False})
+        return snapshot[result_name]
+
+    def get_data(self, user_id, snapshot_id, result_name):
+        snapshots = self.client.db.snapshots
+        snapshot = snapshots.find_one({'user_id': user_id, 'timestamp': snapshot_id},
+                                       {'_id': False})
+        return snapshot[result_name]
 
     def upsert_snapshot(self, user_id, snapshot_timestamp, ty, result):
         snapshots = self.client.db.snapshots
-        # TODO - result isn't saved correctly (fields aren't named)
         snapshots.find_one_and_update({'timestamp': snapshot_timestamp},
-                {'$set': {'user_id': user_id, 'timestamp': snapshot_timestamp, ty: result}},
+                {'$set': {'user_id': user_id, 'timestamp': snapshot_timestamp}},
                 upsert=True)
+
+        result = {ty: result}
+        snapshots.update({'timestamp': snapshot_timestamp}, {'$push': {'results': result}})
 
 
 def find_driver(url):
