@@ -75,8 +75,15 @@ class MongoDriver:
     def get_result(self, user_id, snapshot_id, result_name):
         snapshots = self.client.db.snapshots
         snapshot = snapshots.find_one({'user_id': user_id, 'timestamp': snapshot_id},
-                                       {'_id': False})
-        return snapshot[result_name]
+                                      {'_id': False, 'results': True})
+
+        results = snapshot['results']
+
+        result = next(filter(lambda res: result_name in res, results), None)
+
+        if result is not None:
+            return result[result_name]
+        return None
 
     def get_data(self, user_id, snapshot_id, result_name):
         snapshots = self.client.db.snapshots
