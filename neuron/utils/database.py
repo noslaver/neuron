@@ -91,12 +91,6 @@ class MongoDriver:
             return result[result_name]
         return None
 
-    def get_data(self, user_id, snapshot_id, result_name):
-        snapshots = self.client.db.snapshots
-        snapshot = snapshots.find_one({'user_id': user_id, 'timestamp': snapshot_id},
-                                       {'_id': False})
-        return snapshot[result_name]
-
     def upsert_snapshot(self, user_id, snapshot_timestamp, ty, result):
         snapshots = self.client.db.snapshots
         snapshots.find_one_and_update({'timestamp': snapshot_timestamp},

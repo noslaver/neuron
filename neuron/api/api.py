@@ -1,5 +1,6 @@
 from ..utils import Database
-from flask import Flask, g, jsonify, request
+from flask import Flask, g, jsonify, request, send_from_directory
+import os
 
 
 app = Flask(__name__)
@@ -45,13 +46,22 @@ def result(user_id, snapshot_id, result_name):
     if result is None:
         return ('', 404)
 
+    if 'image' in result_name:
+        result = { 'data_url': f'{request.url}/data' }
+
+
     return jsonify(result)
 
 
 @app.route('/users/<user_id>/snapshots/<int:snapshot_id>/<result_name>/data', methods=['GET'])
 def result_data(user_id, snapshot_id, result_name):
-    data_path = db.get_data(user_id=user_id, snapshot_id=snapshot_id, result_name=result_name)
-    return send_file(data_path)
+    result = db.get_result(user_id=user_id, snapshot_id=snapshot_id, result_name=result_name)
+
+    if result is None:
+        return ('', 404)
+
+    data_path = result['parsed_image_path']
+    return send_from_directory(os.getcwd(), data_path)
 
 
 def run_api_server(host, port, db_url):
