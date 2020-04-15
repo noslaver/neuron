@@ -1,6 +1,8 @@
 from neuron.client import upload_sample
 from neuron.client.reader import Reader
 
+import pytest
+import requests
 import subprocess
 import time
 
@@ -18,9 +20,23 @@ def test_reader():
 
     assert len(snapshots) == 1
 
-def test_api():
+
+@pytest.fixture
+def mock_response(monkeypatch):
+    def mock_post(url, data, headers):
+        return MockResponse()
+    monkeypatch.setattr(requests, 'post', mock_post)
+
+
+class MockResponse:
+    def __init__(self):
+        self.status_code = 204
+
+
+def test_api(mock_response):
     host, port = _SERVER_ADDRESS
     upload_sample(host, port, _SAMPLE_PATH)
+
 
 def test_cli():
     time.sleep(0.1)
