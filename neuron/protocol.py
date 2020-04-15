@@ -39,25 +39,3 @@ class Snapshot:
         return f'Snapshot from {self.timestamp} on {self.pose.translation}' + \
                f' / {self.pose.rotation}, ' + f'with a {self.color_image} ' + \
                f'and a {self.depth_image}.'
-
-    def with_fields(self, fields):
-        timestamp = self.timestamp
-        translation = (0, 0, 0)
-        rotation = (0, 0, 0, 0)
-        color_image = Image('color', 0, 0, None)
-        depth_image = Image('depth', 0, 0, None)
-        feelings = Feelings(0, 0, 0, 0)
-
-        if 'translation' in fields:
-            translation = self.translation
-        if 'rotation' in fields:
-            rotation = self.rotation
-        if 'color_image' in fields:
-            color_image = self.color_image
-        if 'depth_image' in fields:
-            depth_image = self.depth_image
-        if 'feelings' in fields:
-            feelings = self.feelings
-
-        return Snapshot(timestamp, translation, rotation, color_image, 
-                        depth_image, feelings)

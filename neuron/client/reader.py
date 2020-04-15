@@ -100,6 +100,8 @@ class Reader:
             self.fp = gzip.open(path, 'rb')
             self.parser = ProtobufParser()
 
+        self.user = None
+
     def read(self):
         self.user = self.parser.parse_user_info(self.fp)
         while True:
