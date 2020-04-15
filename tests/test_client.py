@@ -39,15 +39,23 @@ def test_api(mock_response):
 
 
 def test_cli():
-    time.sleep(0.1)
     host, port = _SERVER_ADDRESS
-    process = subprocess.Popen(
-        ['python', '-m', _PACKAGE_NAME, 'upload-sample',
-            '-H', host, '-p', str(port), _SAMPLE_PATH],
+    server = subprocess.Popen(
+        ['python', '-m', 'http.server', str(port), '--bind', host],
         stdout=subprocess.PIPE,
     )
+    try:
+        time.sleep(0.1)
+        process = subprocess.Popen(
+            ['python', '-m', _PACKAGE_NAME, 'upload-sample',
+                '-H', host, '-p', str(port), _SAMPLE_PATH],
+            stdout=subprocess.PIPE,
+        )
+        time.sleep(0.5)
 
-    stdout, stderr = process.communicate()
+        stdout, stderr = process.communicate()
 
-    assert not stdout
-    assert not stderr
+        assert b'Uploading snapshot #1' in stdout
+        assert not stderr
+    finally:
+        server.terminate()
