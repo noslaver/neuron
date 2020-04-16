@@ -1,4 +1,3 @@
-import datetime as dt
 import struct
 
 from ..protobuf import neuron_pb2
@@ -28,46 +27,77 @@ class BinaryParser:
         name_len = read_int(fp)
         username = fp.read(name_len).decode('utf-8')
 
-        birthdate = dt.datetime.fromtimestamp(read_int(fp))
+        birthday = read_int(fp)
 
         gender = fp.read(1).decode('utf-8')
 
-        return (user_id, username, birthdate, gender)
+        if gender == 'm':
+            gender = 0
+        else if gender == 'f':
+            gender = 1
+        else:
+            gender = 2
+
+        user = neuron_pb2.User()
+        user.user_id = user_id
+        user.username = username
+        user.birthday = birthday
+        user.gender = gender
+
+        return user
 
     def parse_snapshot(self, fp):
-        timestamp = dt.datetime.fromtimestamp(read_long(fp) / 1000.0)
+        snapshot = neuron_pb2.Snapshot()
+
+        datetime = read_long(fp)
+        snapshot.datetime = datetime
 
         x = read_double(fp)
         y = read_double(fp)
         z = read_double(fp)
-        translation = (x, y, z)
+
+        pose = snapshot.pose
+        trans = pose.translation
+        trans.x, trans.y, trans.z = x, y, z
 
         x = read_double(fp)
         y = read_double(fp)
         z = read_double(fp)
         w = read_double(fp)
-        rotation = (x, y, z, w)
+
+        rot = pose.rotation
+        rot.x, rot.y, rot.z, rot.w = x, y, z, w
 
         height = read_int(fp)
         width = read_int(fp)
-        # TODO - convert BGR to RGB
         image_pixels = fp.read(height * width * 3)
-        color_image = Image('color', height, width, image_pixels)
+
+        color_image = snapshot.color_image
+        color_image.height = height
+        color_image.width = width
+        color_image.data = image_pixels
 
         height = read_int(fp)
         width = read_int(fp)
         image_depths = fp.read(height * width * 4)
-        depth_image = Image('depth', height, width, image_depths)
+
+        depth_image = snapshot.depth_image
+        depth_image.height = height
+        depth_image.width = width
+        depth_image.data.extend(image_depths)
 
         hunger = read_float(fp)
         thirst = read_float(fp)
         exhaustion = read_float(fp)
         happiness = read_float(fp)
-        feelings = Feelings(hunger, thirst, exhaustion, happiness)
 
-        return Snapshot(timestamp, translation, rotation, color_image,
-                        depth_image, feelings)
+        feelings = snapshot.feelings
+        feelings.hunger = hunger
+        feelings.thirst = thirst
+        feelings.exhaustion = exhaustion
+        feelings.happiness = happiness
 
+        return snapshot
 
 class ProtobufParser:
     def parse_user_info(self, fp):
@@ -110,6 +140,6 @@ class Reader:
                 if snapshot is None:
                     break
                 yield snapshot
-            except ValueError:
+            except (ValueError, struct.error):
                 self.fp.close()
                 break

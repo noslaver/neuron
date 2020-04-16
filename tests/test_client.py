@@ -9,9 +9,21 @@ import time
 _PACKAGE_NAME = 'neuron.client'
 _SERVER_ADDRESS = '127.0.0.1', 8000
 _SAMPLE_PATH = 'tests/sample.mind.gz'
+_SAMPLE_PATH_BINARY = 'tests/sample.mind'
 
-def test_reader():
+def test_reader_protobuf():
     reader = Reader(_SAMPLE_PATH, 'protobuf')
+
+    snapshots = list(reader.read())
+
+    assert reader.user.username == 'John Smith'
+    assert reader.user.user_id == 42
+
+    assert len(snapshots) == 1
+
+
+def test_reader_binary():
+    reader = Reader(_SAMPLE_PATH_BINARY, 'binary')
 
     snapshots = list(reader.read())
 
@@ -51,7 +63,6 @@ def test_cli():
                 '-H', host, '-p', str(port), _SAMPLE_PATH],
             stdout=subprocess.PIPE,
         )
-        time.sleep(0.5)
 
         stdout, stderr = process.communicate()
 
@@ -67,7 +78,6 @@ def test_cli_error():
             '-H', host, '-p', str(port), _SAMPLE_PATH],
         stdout=subprocess.PIPE,
     )
-    time.sleep(0.2)
 
     stdout, stderr = process.communicate()
 
