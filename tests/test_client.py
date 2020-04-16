@@ -59,3 +59,17 @@ def test_cli():
         assert not stderr
     finally:
         server.terminate()
+
+def test_cli_error():
+    host, port = _SERVER_ADDRESS
+    process = subprocess.Popen(
+        ['python', '-m', _PACKAGE_NAME, 'upload-sample',
+            '-H', host, '-p', str(port), _SAMPLE_PATH],
+        stdout=subprocess.PIPE,
+    )
+    time.sleep(0.2)
+
+    stdout, stderr = process.communicate()
+
+    assert b'Failed to connect to server' in stdout
+    assert process.returncode != 0
