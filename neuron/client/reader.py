@@ -99,6 +99,7 @@ class BinaryParser:
 
         return snapshot
 
+
 class ProtobufParser:
     def parse_user_info(self, fp):
         length = read_int(fp)

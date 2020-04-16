@@ -31,3 +31,23 @@ $ pytest tests
 ```
 
 ## Usage
+
+### Client
+
+neuron's client allows publishing a `mind` sample to a server.
+The client is availablre as both an API and a CLI.
+
+API usage:
+```python
+from neuron.client import upload_sample
+
+upload_sample(host='127.0.0.1', port=8000, path='sample.mind.gz')
+```
+
+CLI usage:
+```bash
+$ python -m neuron.client upload-sample \
+        -H/--host '127.0.0.1'
+        -p/--port 8000
+        'snapshot.mind.gz'
+```

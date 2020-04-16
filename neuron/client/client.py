@@ -20,7 +20,8 @@ def upload_sample(host, port, path):
         headers = {'Content-Type': 'application/protobuf'}
 
         response = requests.post(
-            f'{server_url}/users/{request.user.user_id}/snapshots', data=data, headers=headers)
+            f'{server_url}/users/{request.user.user_id}/snapshots', data=data,
+            headers=headers)
 
         if response.status_code != 204:
             print('Error uploading snapshot to server')

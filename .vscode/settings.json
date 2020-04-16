@@ -2,5 +2,11 @@
     "python.pythonPath": ".env/bin/python3.8",
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "files.exclude": {
+        ".env": true
+    },
+    "files.watcherExclude": {
+        "**/.env/**": true
+    }
 }
