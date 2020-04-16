@@ -33,7 +33,7 @@ class BinaryParser:
 
         if gender == 'm':
             gender = 0
-        else if gender == 'f':
+        elif gender == 'f':
             gender = 1
         else:
             gender = 2
