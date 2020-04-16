@@ -57,6 +57,8 @@ $ python -m neuron.client upload-sample \
 neuron's server receives `mind` samples uploaded by clients and publishes them.
 The exact publish method is configurable. By default, received samples are published to a RabbitMQ message bus.
 
+Note that large binary data is saved to local storage, and only its location is published.
+
 The server is available as both an API and a CLI.
 
 API usage:
@@ -76,3 +78,12 @@ $ python -m neuron.client run-server \
         -p/--port 8000
         'rabbitmq://127.0.0.1:5672'
 ```
+
+### Parsers
+### Saver
+### API
+### CLI
+### GUI
+
+## Deployment
+neuron can be fully deployed in a docker environment, using the `run-pipeline.sh` script.
