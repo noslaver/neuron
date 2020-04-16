@@ -2,7 +2,6 @@ from neuron.client import upload_sample
 from neuron.client.reader import Reader
 
 import pytest
-import requests
 import subprocess
 import time
 
@@ -37,6 +36,7 @@ def test_reader_binary():
 def mock_response(monkeypatch):
     def mock_post(url, data, headers):
         return MockResponse()
+    import requests
     monkeypatch.setattr(requests, 'post', mock_post)
 
 
@@ -71,7 +71,8 @@ def test_cli():
     finally:
         server.terminate()
 
-def test_cli_error():
+
+def test_cli_server_error():
     host, port = _SERVER_ADDRESS
     process = subprocess.Popen(
         ['python', '-m', _PACKAGE_NAME, 'upload-sample',
@@ -82,4 +83,21 @@ def test_cli_error():
     stdout, stderr = process.communicate()
 
     assert b'Failed to connect to server' in stdout
+    assert process.returncode != 0
+
+
+def test_cli_bad_sample(tmp_path):
+    bad_sample = tmp_path / 'sample.mind.gz'
+    bad_sample.write_text('content')
+
+    host, port = _SERVER_ADDRESS
+    process = subprocess.Popen(
+        ['python', '-m', _PACKAGE_NAME, 'upload-sample',
+            '-H', host, '-p', str(port), bad_sample],
+        stdout=subprocess.PIPE,
+    )
+
+    stdout, stderr = process.communicate()
+
+    assert b'An error occurred' in stdout
     assert process.returncode != 0

@@ -18,6 +18,9 @@ def upload_sample(path, host, port):
     except requests.exceptions.ConnectionError:
         print('Failed to connect to server, exiting...')
         exit(1)
+    except:
+        print('An error occurred while uploading sample, aborting...')
+        exit(2)
 
 
 if __name__ == '__main__':
