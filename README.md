@@ -35,7 +35,7 @@ $ pytest tests
 ### Client
 
 neuron's client allows publishing a `mind` sample to a server.
-The client is availablre as both an API and a CLI.
+The client is available as both an API and a CLI.
 
 API usage:
 ```python
@@ -50,4 +50,29 @@ $ python -m neuron.client upload-sample \
         -H/--host '127.0.0.1'
         -p/--port 8000
         'snapshot.mind.gz'
+```
+
+### Server
+
+neuron's server receives `mind` samples uploaded by clients and publishes them.
+The exact publish method is configurable. By default, received samples are published to a RabbitMQ message bus.
+
+The server is available as both an API and a CLI.
+
+API usage:
+```python
+from neuron.server import run_server
+
+def handle_sample(sample):
+    print(sample)
+
+upload_sample(host='127.0.0.1', port=8000, publish=handle_sample)
+```
+
+CLI usage:
+```bash
+$ python -m neuron.client run-server \
+        -H/--host '127.0.0.1'
+        -p/--port 8000
+        'rabbitmq://127.0.0.1:5672'
 ```
