@@ -99,7 +99,7 @@ def snapshot(user_id):
 
 
 def run_server(host, port, publish):
+    from waitress import serve
     global message_handler
-    global _RAW_DIR
     message_handler = publish
-    app.run(host=host, port=port)
+    serve(app, host=host, port=port)
