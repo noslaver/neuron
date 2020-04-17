@@ -7,13 +7,23 @@ import struct
 
 app = Flask(__name__)
 
-_RAW_DIR = 'raw'
+_RAW_DIR = Path('raw')
+
+
+def message_handler(message):
+    pass
 
 
 @app.route('/users/<user_id>/snapshots', methods=['POST'])
 def snapshot(user_id):
-    data = neuron_pb2.SnapshotInfo()
-    data.ParseFromString(request.data)
+    if request.data == b'':
+        return ('', 400)
+
+    try:
+        data = neuron_pb2.SnapshotInfo()
+        data.ParseFromString(request.data)
+    except ValueError:
+        return ('', 400)
 
     snap = data.snapshot
     user = data.user
@@ -23,7 +33,7 @@ def snapshot(user_id):
 
     date = dt.datetime.fromtimestamp(snap.datetime / 1000.0)
 
-    directory = Path(_RAW_DIR) / str(user_id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
+    directory = _RAW_DIR / str(user_id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
     directory.mkdir(parents=True, exist_ok=True)
 
     color_image_path = str(directory / 'color_image')
@@ -86,11 +96,10 @@ def snapshot(user_id):
     return ('', 204)
 
 
-def message_handler():
-    pass
 
 
 def run_server(host, port, publish):
     global message_handler
+    global _RAW_DIR
     message_handler = publish
     app.run(host=host, port=port)

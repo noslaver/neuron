@@ -55,6 +55,7 @@ $ python -m neuron.client upload-sample \
 ### Server
 
 neuron's server receives `mind` samples uploaded by clients and publishes them.
+Clients should send a `POST` request to `/users/<user_id>/snapshots`. The request body should contain a Protobuf message of type SnapshotInfo, as described in `neuron/protobuf/neuron.proto`.
 The exact publish method is configurable. By default, received samples are published to a RabbitMQ message bus.
 
 Note that large binary data is saved to local storage, and only its location is published.
