@@ -96,6 +96,9 @@ def snapshot(user_id):
     return ('', 204)
 
 
+def config_raw_dir(raw_dir):
+    global _RAW_DIR
+    _RAW_DIR = Path(raw_dir)
 
 
 def run_server(host, port, publish):

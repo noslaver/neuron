@@ -24,7 +24,11 @@ def run_server(msgqueue_url, host, port, prnt):
     else:
         print('Unsupported message queue type.')
         exit(1)
-    run(host, port, publish=publish)
+    try:
+        run(host, port, publish=publish)
+    except Exception as e:
+        print(e)
+        exit(1)
 
 
 if __name__ == '__main__':
