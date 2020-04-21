@@ -2,7 +2,7 @@ from .rabbit import RabbitHandler
 from .server import run_server as run
 from ..utils import retry
 import click
-import time
+import os
 
 
 @click.group()
@@ -21,7 +21,11 @@ def run_server(msgqueue_url, host, port, prnt):
     if msgqueue_url is not None and msgqueue_url.startswith('rabbitmq://'):
         handler = RabbitHandler(msgqueue_url[len('rabbitmq://'):])
 
-        retry(handler.connect, times=5)
+        try:
+            times = int(os.getenv('NEURON_SERVER_QUEUE_CONNECT_RETRIES', 5))
+        except ValueError:
+            times = 5
+        retry(handler.connect, times=times)
 
         publish = handler.handle
     elif prnt:

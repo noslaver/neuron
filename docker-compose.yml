@@ -12,3 +12,5 @@ services:
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.server run-server rabbitmq://rabbit:5672"
+        environment:
+            - NEURON_SERVER_QUEUE_CONNECT_RETRIES=1000
