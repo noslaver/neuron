@@ -1,0 +1,6 @@
+**
+!neuron
+!requirements.txt
+**/*.pyc
+**/Dockerfile
+**/*.swp
