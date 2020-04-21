@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+    rabbit:
+        image: rabbitmq:alpine
+
+    neuron-server:
+        image: neuron/server
+        build:
+            context: .
+            dockerfile: Dockerfile
+        depends_on:
+            - rabbit
+        entrypoint: "python -m neuron.server run-server rabbitmq://rabbit:5672"
