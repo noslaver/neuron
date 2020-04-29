@@ -1,1 +1,1 @@
-from .parsers import Parsers, ParseContext
+from .parsers import Parsers, ParseContext, parse

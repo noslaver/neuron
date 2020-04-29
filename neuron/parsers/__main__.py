@@ -1,4 +1,4 @@
-from .parsers import run_parser
+from .parsers import parse
 import click
 from collections import namedtuple
 import json
@@ -20,7 +20,7 @@ def cli():
 @click.argument('data', type=click.File('rb'))
 def command_parse(parser, data):
     snapshot = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-    res = run_parser(parser, snapshot)
+    res = parse(parser, snapshot)
     print(json.dumps(res))
 
 
@@ -44,7 +44,7 @@ def command_run_parser(parser, msgqueue_url):
             try:
                 snapshot = json.loads(
                         body, object_hook=lambda d: namedtuple('NeuronStruct', d.keys())(*d.values()))
-                res = run_parser(parser, snapshot)
+                res = parse(parser, snapshot)
 
                 msg = json.dumps(res)
                 channel.basic_publish(exchange=_RESULTS_EXCHANGE, routing_key=parser, body=msg)

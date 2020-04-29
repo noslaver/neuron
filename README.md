@@ -81,6 +81,30 @@ $ python -m neuron.client run-server \
 ```
 
 ### Parsers
+
+neuron's parsers process incoming `mind` samples. Each parser specifies which part of the sample it is interested and returns a processed result, which based on the interface used, can be published to a message queue or output to sdtout.
+
+API usage:
+```python
+from cortex.parsers import parse
+data = ...
+result = parse('pose', data)
+```
+
+CLI usage:
+There are two usage, one to parse a file containig raw data:
+```bash
+$ python -m cortex.parsers parse 'pose' 'snapshot.raw' > 'pose.result'
+```
+
+The other subscribes to a message queue and publishes the processed result back to the broker:
+```bash
+$ python -m cortex.parsers run_parser 'pose' 'rabbitmq://127.0.0.1:5672'
+```
+
+#### Available parsers
+
+#### Adding a new parser
 ### Saver
 ### API
 ### CLI

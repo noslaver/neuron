@@ -43,7 +43,7 @@ class ParseContext:
         return self.directory / filename
 
 
-def run_parser(parser, data):
+def parse(parser, data):
     parsers = Parsers()
     parsers.load_modules('neuron/parsers')
 
