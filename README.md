@@ -102,9 +102,16 @@ The other subscribes to a message queue and publishes the processed result back 
 $ python -m cortex.parsers run_parser 'pose' 'rabbitmq://127.0.0.1:5672'
 ```
 
-#### Available parsers
-
 #### Adding a new parser
+
+To add a new parsers, simply add a new `.py` file into `neuron/parsers`. You can expose your parser either with a class or with a function.
+To expose as a class, your file should contain a class whose name ends with "Parser". The class should have a `parse(self, context, snapshot)` method.
+The class should also have a attribute named `field` which is a string indicating which parts of the snapshot it should be passed (e.g. `pose`).
+
+To expose as a function, your file should contain a function whose name begins with "parse".
+The function signature should be `parse_xxx(context, snapshot)`.
+You should add an attribute to the function named `field` which is a string indicating which parts of the snapshot it should be passed (e.g. `pose`).
+
 ### Saver
 ### API
 ### CLI
