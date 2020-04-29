@@ -1,7 +1,6 @@
 import struct
 
 from ..protobuf import neuron_pb2
-from ..protocol import Image, Feelings, Snapshot
 
 
 def read_int(fp):
