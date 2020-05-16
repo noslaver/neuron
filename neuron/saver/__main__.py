@@ -25,8 +25,8 @@ def save(parser, data, db_url):
 
 
 @cli.command()
-@click.argument('db_url')
-@click.argument('msgqueue_url')
+@click.argument('db_url', default='mongodb://127.0.0.1:27017')
+@click.argument('msgqueue_url', default='rabbitmq://127.0.0.1:5672')
 def run_saver(db_url, msgqueue_url):
     if not msgqueue_url.startswith('rabbitmq://'):
         print('Unsupported message queue type.')
@@ -47,7 +47,8 @@ def run_saver(db_url, msgqueue_url):
     for method, _, body in channel.consume(queue):
         try:
             parser = method.routing_key
-            saver.save(parser, body)
+            data = json.loads(body)
+            saver.save(parser, data)
         except Exception:
             print('Failed to save data')
             break
