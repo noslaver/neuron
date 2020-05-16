@@ -12,7 +12,7 @@ _SNAPSHOT_PATH = 'tests/snapshot_info.json'
 @pytest.fixture
 def raw_snapshot():
     with open(_SNAPSHOT_PATH, 'r') as reader:
-        yield json.loads(reader.read(), object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        yield json.loads(reader.read())
 
 
 def test_pose_parser(raw_snapshot):

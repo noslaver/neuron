@@ -1,6 +1,5 @@
 from .parsers import parse
 import click
-from collections import namedtuple
 import json
 
 
@@ -18,7 +17,7 @@ def cli():
 @click.argument('data', type=click.File('rb'))
 def command_parse(parser, data):
     try:
-        snapshot = json.load(data, object_hook=lambda d: namedtuple('NeuronStruct', d.keys())(*d.values()))
+        snapshot = json.load(data)
     except:
         print('An error occurred. Bad JSON input.')
         exit(1)
@@ -52,8 +51,7 @@ def command_run_parser(parser, msgqueue_url):
 
         for _, _, body in channel.consume(queue, auto_ack=True):
             try:
-                snapshot = json.loads(
-                        body, object_hook=lambda d: namedtuple('NeuronStruct', d.keys())(*d.values()))
+                snapshot = json.loads(body)
                 res = parse(parser, snapshot)
 
                 msg = json.dumps(res)
