@@ -23,7 +23,7 @@ class Parsers:
                                           package=root.name)
 
             funcs = {f.field: f for name, f in mod.__dict__.items()
-                     if callable(f) and name.startswith('parse')}
+                     if callable(f) and name.startswith('parse_')}
             self.parsers.update(funcs)
 
             funcs = {c.field: c().parse for name, c in mod.__dict__.items()

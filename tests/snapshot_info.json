@@ -1,0 +1,38 @@
+{
+    "user": {
+        "id": "42",
+        "name": "John Smith",
+        "birthday": 699746400,
+        "gender": "Male"
+    },
+    "timestamp": 1575446887339,
+    "pose": {
+        "translation": {
+            "x": 0.487,
+            "y": 0.007,
+            "z": -1.13
+        },
+        "rotation": {
+            "x": -0.108,
+            "y": -0.267,
+            "z": -0.021,
+            "w": 0.957
+        }
+    },
+    "color_image": {
+        "height": 2,
+        "width": 2,
+        "path": "tests/color_image"
+    },
+    "depth_image": {
+        "height": 2,
+        "width": 2,
+        "path": "tests/depth_image"
+    },
+    "feelings": {
+        "hunger": 0.5,
+        "thirst": 0.6,
+        "exhaustion": 0.7,
+        "happiness": 0.8
+    }
+}

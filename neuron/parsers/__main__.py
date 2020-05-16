@@ -2,8 +2,6 @@ from .parsers import parse
 import click
 from collections import namedtuple
 import json
-import pika
-import uuid
 
 
 _SNAPSHOTS_EXCHANGE = 'snapshots'
@@ -19,8 +17,18 @@ def cli():
 @click.argument('parser', type=str)
 @click.argument('data', type=click.File('rb'))
 def command_parse(parser, data):
-    snapshot = json.load(data, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
-    res = parse(parser, snapshot)
+    try:
+        snapshot = json.load(data, object_hook=lambda d: namedtuple('NeuronStruct', d.keys())(*d.values()))
+    except:
+        print('An error occurred. Bad JSON input.')
+        exit(1)
+
+    try:
+        res = parse(parser, snapshot)
+    except:
+        print('An error occurred. Failed to parse input snapshot.')
+        exit(1)
+
     print(json.dumps(res))
 
 
@@ -28,6 +36,8 @@ def command_parse(parser, data):
 @click.argument('parser', type=str)
 @click.argument('msgqueue_url')
 def command_run_parser(parser, msgqueue_url):
+    import pika
+    import uuid
     if msgqueue_url.startswith('rabbitmq://'):
         url = msgqueue_url[len('rabbitmq://'):]
         host, port = url.split(':')
@@ -54,18 +64,9 @@ def command_run_parser(parser, msgqueue_url):
 
         channel.close()
         connection.close()
-
-
-class Struct(object):
-    def __init__(self, data):
-        for name, value in data.iter():
-            setattr(self, name, self._wrap(value))
-
-    def _wrap(self, value):
-        if isinstance(value, (tuple, list, set, frozenset)):
-            return type(value)([self._wrap(v) for v in value])
-        else:
-            return Struct(value) if isinstance(value, dict) else value
+    else:
+        print('Unsupported message queue type.')
+        exit(1)
 
 
 if __name__ == '__main__':
