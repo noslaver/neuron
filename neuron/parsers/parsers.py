@@ -48,7 +48,7 @@ def parse(parser, data):
     parsers.load_modules('neuron/parsers')
 
     user = data.user
-    date = dt.datetime.fromtimestamp(data.timestamp / 1000.0)
+    date = dt.datetime.utcfromtimestamp(data.timestamp / 1000.0)
 
     directory = pathlib.Path(_DATA_DIR) / str(user.id) / date.strftime('%Y-%m-%d_%H-%M-%S-%f')
     directory.mkdir(parents=True, exist_ok=True)

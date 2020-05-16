@@ -64,7 +64,7 @@ def test_color_image_parser(raw_snapshot):
     assert user['name'] == 'John Smith'
     assert user['gender'] == 'Male'
 
-    assert result['data']['parsed_image_path'] == 'data/42/2019-12-04_10-08-07-339000/color_image.jpg'
+    assert result['data']['parsed_image_path'] == 'data/42/2019-12-04_08-08-07-339000/color_image.jpg'
 
 
 def test_depth_image_parser(raw_snapshot):
@@ -76,7 +76,7 @@ def test_depth_image_parser(raw_snapshot):
     assert user['name'] == 'John Smith'
     assert user['gender'] == 'Male'
 
-    assert result['data']['parsed_image_path'] == 'data/42/2019-12-04_10-08-07-339000/depth_image.png'
+    assert result['data']['parsed_image_path'] == 'data/42/2019-12-04_08-08-07-339000/depth_image.png'
 
 
 def test_cli_unsupprted_queue(tmp_path):
