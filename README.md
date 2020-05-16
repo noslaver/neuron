@@ -47,8 +47,8 @@ upload_sample(host='127.0.0.1', port=8000, path='sample.mind.gz')
 CLI usage:
 ```bash
 $ python -m neuron.client upload-sample \
-        -H/--host '127.0.0.1'
-        -p/--port 8000
+        -H/--host '127.0.0.1' \
+        -p/--port 8000 \
         'snapshot.mind.gz'
 ```
 
@@ -75,8 +75,8 @@ upload_sample(host='127.0.0.1', port=8000, publish=handle_sample)
 CLI usage:
 ```bash
 $ python -m neuron.client run-server \
-        -H/--host '127.0.0.1'
-        -p/--port 8000
+        -H/--host '127.0.0.1' \
+        -p/--port 8000 \
         'rabbitmq://127.0.0.1:5672'
 ```
 
@@ -113,6 +113,33 @@ The function signature should be `parse_xxx(context, snapshot)`.
 You should add an attribute to the function named `field` which is a string indicating which parts of the snapshot it should be passed (e.g. `pose`).
 
 ### Saver
+
+neuron's saver allows saving processed `mind` data, published by the parsers, into databases.
+
+API usage:
+```python
+from cortex.saver import Saver
+saver = Saver(database_url)
+data = ...
+saver.save('pose', data)
+```
+
+CLI usage:
+There are two usage, one to parse a file containig raw data:
+```bash
+$ python -m cortex.saver save \
+    -d/--database 'mongodb://127.0.0.1:27017' \
+    'pose' \
+    'pose.result'
+```
+
+The other subscribes to a message queue and publishes the processed result back to the broker:
+```bash
+$ python -m cortex.saver run_saver \
+    'mongodb://127.0.0.1:27017' \
+    'rabbitmq://127.0.0.1:5672'
+```
+
 ### API
 ### CLI
 ### GUI
