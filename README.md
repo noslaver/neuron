@@ -125,7 +125,7 @@ saver.save('pose', data)
 ```
 
 CLI usage:
-There are two usage, one to parse a file containig raw data:
+There are two usage, one to save a file containig processed data:
 ```bash
 $ python -m cortex.saver save \
     -d/--database 'mongodb://127.0.0.1:27017' \
@@ -133,7 +133,7 @@ $ python -m cortex.saver save \
     'pose.result'
 ```
 
-The other subscribes to a message queue and publishes the processed result back to the broker:
+The other subscribes to a message queue and saves published processed data to the database:
 ```bash
 $ python -m cortex.saver run_saver \
     'mongodb://127.0.0.1:27017' \
@@ -141,7 +141,65 @@ $ python -m cortex.saver run_saver \
 ```
 
 ### API
+
+neuron's API allows a runs a server which exposes the processed data to an endpoint user via HTTP.
+
+API usage:
+```python
+from cortex.api import run_api_server
+run_api_server(
+    host = '127.0.0.1',
+    port = 8000,
+    database_url = 'mongodb://127.0.0.1:27017' 
+)
+```
+
+CLI usage:
+```bash
+$ python -m cortex.api run-server \
+    -H/--host '127.0.0.1' \
+    -p/--port 8000 \
+    -d/--database 'mongodb://127.0.0.1:27017'
+```
+
+The API exposes the following endpoints:
+* **GET /users**
+
+    Returns the list of all the supported users.
+
+* **GET /user/{user_id}**
+
+    Returns the specified user's info.
+
+* **GET /user/{user_id}/snapshots**
+
+    Returns the list of the specified user's snapshots.
+
+* **GET /user/{user_id}/snapshots/{snapshot_id}**
+
+    Returns the specified snapshot's info.
+    Note that a snapshot is identified by its timestamp.
+
+* **GET /user/{user_id}/snapshots/{snapshot_id}/results-name**
+
+    Returns the specified snapshot's result.
+
 ### CLI
+
+neuron's CLI consumes neuron's API.
+
+CLI usage:
+There are two usage, one to parse a file containig raw data:
+```bash
+$ python -m cortex.cli get-users
+
+$ python -m cortex.cli get-user 42
+
+$ python -m cortex.cli get-snapshot 42 1575446890088
+
+$ python -m cortex.cli get-snapshot 42 1575446890088 pose
+```
+
 ### GUI
 
 ## Deployment
