@@ -37,34 +37,35 @@ def command_parse(parser, data):
 def command_run_parser(parser, msgqueue_url):
     import pika
     import uuid
-    if msgqueue_url.startswith('rabbitmq://'):
-        url = msgqueue_url[len('rabbitmq://'):]
-        host, port = url.split(':')
-        port = int(port)
 
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=port))
-        channel = connection.channel()
-        res = channel.queue_declare(queue=f'parser_{parser}_{uuid.uuid1()}', auto_delete=True)
-        queue = res.method.queue
-        channel.queue_bind(exchange=_SNAPSHOTS_EXCHANGE, queue=queue, routing_key='#')
-        channel.exchange_declare(exchange=_RESULTS_EXCHANGE, exchange_type='topic')
-
-        for _, _, body in channel.consume(queue, auto_ack=True):
-            try:
-                snapshot = json.loads(body)
-                res = parse(parser, snapshot)
-
-                msg = json.dumps(res)
-                channel.basic_publish(exchange=_RESULTS_EXCHANGE, routing_key=parser, body=msg)
-            except Exception:
-                print('Failed to parse data')
-                break
-
-        channel.close()
-        connection.close()
-    else:
+    if not msgqueue_url.startswith('rabbitmq://'):
         print('Unsupported message queue type.')
         exit(1)
+
+    url = msgqueue_url[len('rabbitmq://'):]
+    host, port = url.split(':')
+    port = int(port)
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=port))
+    channel = connection.channel()
+    res = channel.queue_declare(queue=f'parser_{parser}_{uuid.uuid1()}', auto_delete=True)
+    queue = res.method.queue
+    channel.queue_bind(exchange=_SNAPSHOTS_EXCHANGE, queue=queue, routing_key='#')
+    channel.exchange_declare(exchange=_RESULTS_EXCHANGE, exchange_type='topic')
+
+    for _, _, body in channel.consume(queue, auto_ack=True):
+        try:
+            snapshot = json.loads(body)
+            res = parse(parser, snapshot)
+
+            msg = json.dumps(res)
+            channel.basic_publish(exchange=_RESULTS_EXCHANGE, routing_key=parser, body=msg)
+        except Exception:
+            print('Failed to parse data')
+            break
+
+    channel.close()
+    connection.close()
 
 
 if __name__ == '__main__':

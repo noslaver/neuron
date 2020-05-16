@@ -80,9 +80,6 @@ def test_depth_image_parser(raw_snapshot):
 
 
 def test_cli_unsupprted_queue(tmp_path):
-    bad_sample = tmp_path / 'snapshot.json'
-    bad_sample.write_text('not json')
-
     process = subprocess.Popen(
             ['python', '-m', _PACKAGE_NAME, 'run-parser', 'pose', 'kafka://127.0.0.1:90'],
         stdout=subprocess.PIPE,
