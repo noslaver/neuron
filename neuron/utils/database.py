@@ -106,8 +106,9 @@ class MongoDriver:
 
 def find_driver(url):
     for scheme, cls in drivers.items():
-        if url.startswith(url):
+        if url.startswith(scheme):
             return cls(url)
+    return None
 
 
 drivers = {'mongodb://': MongoDriver}

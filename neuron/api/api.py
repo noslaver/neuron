@@ -67,6 +67,10 @@ def result_data(user_id, snapshot_id, result_name):
 def run_api_server(host, port, db_url):
     from waitress import serve
     global db
+
     db = Database(db_url)
+    if db.driver is None:
+        print('Unsupported database type.')
+        exit(1)
 
     serve(app, host=host, port=port)
