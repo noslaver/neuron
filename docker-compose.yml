@@ -1,71 +1,77 @@
-version: '3'
+version: '3.4'
+
+x-neuron-service: &neuron-service
+    image: neuron
+    build:
+        context: .
+        dockerfile: Dockerfile
+    restart: on-failure
 
 services:
     rabbit:
         image: rabbitmq:alpine
+        ports:
+            - 15672:15672
     mongo:
         image: mongo
 
     server:
-        image: neuron
-        build:
-            context: .
-            dockerfile: Dockerfile
+        <<: *neuron-service
+        ports:
+            - 8000:8000
         depends_on:
             - rabbit
+        volumes:
+            - raw:/raw
         entrypoint: "python -m neuron.server run-server rabbitmq://rabbit:5672"
-        environment:
-            - NEURON_SERVER_QUEUE_CONNECT_RETRIES=1000
 
     parser-pose:
-        image: neuron
-        build:
-            context: .
-            dockerfile: Dockerfile
+        <<: *neuron-service
+        volumes:
+            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser pose rabbitmq://rabbit:5672"
     parser-feelings:
-        image: neuron
-        build:
-            context: .
-            dockerfile: Dockerfile
+        <<: *neuron-service
+        volumes:
+            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser feelings rabbitmq://rabbit:5672"
     parser-depth-image:
-        image: neuron
-        build:
-            context: .
-            dockerfile: Dockerfile
+        <<: *neuron-service
+        volumes:
+            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser depth-image rabbitmq://rabbit:5672"
     parser-color-image:
-        image: neuron
-        build:
-            context: .
-            dockerfile: Dockerfile
+        <<: *neuron-service
+        volumes:
+            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser color-image rabbitmq://rabbit:5672"
 
     saver:
-        image: neuron
-        build:
-            context: .
-            dockerfile: Dockerfile
+        <<: *neuron-service
+        volumes:
+            - data:/data
         depends_on:
             - rabbit
             - mongo
-        entrypoint: "python -m neuron.saver run-saver mongo://mongo:27017 rabbitmq://rabbit:5672"
+        entrypoint: "python -m neuron.saver run-saver mongodb://mongo:27017 rabbitmq://rabbit:5672"
 
     api:
-        image: neuron
-        build:
-            context: .
-            dockerfile: Dockerfile
+        <<: *neuron-service
+        ports:
+            - 5000:5000
         depends_on:
             - rabbit
             - mongo
-        entrypoint: "python -m neuron.api run-server -d mongo://mongo:27017"
+        entrypoint: "python -m neuron.api run-server -d mongodb://mongo:27017"
+
+volumes:
+    raw:
+    data:

@@ -161,7 +161,7 @@ CLI usage:
 ```bash
 $ python -m cortex.api run-server \
     -H/--host '127.0.0.1' \
-    -p/--port 8000 \
+    -p/--port 5000 \
     -d/--database 'mongodb://127.0.0.1:27017'
 ```
 
