@@ -180,7 +180,7 @@ The API exposes the following endpoints:
     Returns the specified snapshot's info.
     Note that a snapshot is identified by its timestamp.
 
-* **GET /user/{user_id}/snapshots/{snapshot_id}/results-name**
+* **GET /user/{user_id}/snapshots/{snapshot_id}/{results-name}**
 
     Returns the specified snapshot's result.
 
