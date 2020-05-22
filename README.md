@@ -30,6 +30,9 @@ $ pytest tests
 ...
 ```
 
+## Deployment
+neuron can be fully deployed in a docker environment, using the `run-pipeline.sh` script.
+
 ## Usage
 
 ### Client
@@ -189,7 +192,6 @@ The API exposes the following endpoints:
 neuron's CLI consumes neuron's API.
 
 CLI usage:
-There are two usage, one to parse a file containig raw data:
 ```bash
 $ python -m cortex.cli get-users
 
@@ -201,6 +203,3 @@ $ python -m cortex.cli get-snapshot 42 1575446890088 pose
 ```
 
 ### GUI
-
-## Deployment
-neuron can be fully deployed in a docker environment, using the `run-pipeline.sh` script.
