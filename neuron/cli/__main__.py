@@ -14,9 +14,11 @@ def get(host, port, url):
     url = f'http://{host}:{port}{url}'
     response = requests.get(url)
 
-    data = json.loads(response.content)
+    if response.status_code != 200:
+        return None
 
-    print_result(response.content)
+    data = json.loads(response.content)
+    return data
 
 
 @click.group()
@@ -28,7 +30,8 @@ def cli():
 @click.option('--host', '-h', help='server\'s IP', default='127.0.0.1')
 @click.option('--port', '-p', help='server\'s port', type=int, default=8000)
 def get_users(host, port):
-    get(host, port, '/users')
+    data = get(host, port, '/users')
+    print_result(data)
 
 
 @cli.command()
@@ -36,7 +39,8 @@ def get_users(host, port):
 @click.option('--host', '-h', help='server\'s IP', default='127.0.0.1')
 @click.option('--port', '-p', help='server\'s port', type=int, default=8000)
 def get_user(user_id, host, port):
-    get(host, port, f'/users/{user_id}')
+    data = get(host, port, f'/users/{user_id}')
+    print_result(data)
 
 
 @cli.command()
@@ -44,7 +48,8 @@ def get_user(user_id, host, port):
 @click.option('--host', '-h', help='server\'s IP', default='127.0.0.1')
 @click.option('--port', '-p', help='server\'s port', type=int, default=8000)
 def get_snapshots(user_id, host, port):
-    get(host, port, f'/users/{user_id}/snapshots')
+    data = get(host, port, f'/users/{user_id}/snapshots')
+    print_result(data)
 
 
 @cli.command()
@@ -53,7 +58,8 @@ def get_snapshots(user_id, host, port):
 @click.option('--host', '-h', help='server\'s IP', default='127.0.0.1')
 @click.option('--port', '-p', help='server\'s port', type=int, default=8000)
 def get_snapshot(user_id, snapshot_id, host, port):
-    get(host, port, f'/users/{user_id}/snapshots/{snapshot_id}')
+    data = get(host, port, f'/users/{user_id}/snapshots/{snapshot_id}')
+    print_result(data)
 
 
 @cli.command()
@@ -65,7 +71,8 @@ def get_snapshot(user_id, snapshot_id, host, port):
 @click.option('--save', '-s', 'path', help='save result to path',
               type=click.File('wb'))
 def get_result(user_id, snapshot_id, result_id, path, host, port):
-    get(host, port, f'/users/{user_id}/snapshots/{snapshot_id}/{result_id}')
+    data = get(host, port, f'/users/{user_id}/snapshots/{snapshot_id}/{result_id}')
+    print_result(data)
 
 
 if __name__ == '__main__':
