@@ -8,7 +8,7 @@ def parse_depth_image(context, snapshot):
     with open(image.path, 'rb') as reader:
         content = reader.read()
         content = struct.unpack(f'{image.width * image.height}f', content)
-        image = np.reshape(content, (image.width, image.height))
+        image = np.reshape(content, (image.height, image.width))
         plt.imshow(image, cmap='hot', interpolation='nearest')
         path = context.path('depth_image.png')
         plt.savefig(path)
