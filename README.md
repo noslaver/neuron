@@ -31,7 +31,11 @@ $ pytest tests
 ```
 
 ## Deployment
-neuron can be fully deployed in a docker environment, using the `run-pipeline.sh` script.
+neuron can be fully deployed in a docker environment, using the `run-pipeline.sh` script, available in the scripts directory.
+
+After deployment, the [`server`](#Server) is available at `localhost:8000`, the [`API`](#API) is available at
+`locahost:5000` and the [`GUI`](#GUI) is available at `localhost:8080`.
+
 
 ## Usage
 
@@ -95,7 +99,7 @@ result = parse('pose', data)
 ```
 
 CLI usage:
-There are two usage, one to parse a file containig raw data:
+There are two usage, one to parse a file containing raw data:
 ```bash
 $ python -m cortex.parsers parse 'pose' 'snapshot.raw' > 'pose.result'
 ```
@@ -128,7 +132,7 @@ saver.save('pose', data)
 ```
 
 CLI usage:
-There are two usage, one to save a file containig processed data:
+There are two usage, one to save a file containing processed data:
 ```bash
 $ python -m cortex.saver save \
     -d/--database 'mongodb://127.0.0.1:27017' \
@@ -189,7 +193,7 @@ The API exposes the following endpoints:
 
 ### CLI
 
-neuron's CLI consumes neuron's API.
+neuron's CLI consumes neuron's [API](#API).
 
 CLI usage:
 ```bash
@@ -204,7 +208,7 @@ $ python -m cortex.cli get-snapshot 42 1575446890088 pose
 
 ### GUI
 
-neuron's GUI visualizes the API.
+neuron's GUI visualizes the [API](#API).
 
 API usage:
 ```python
