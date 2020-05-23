@@ -6,7 +6,7 @@ import plotly
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import requests
-
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ def create_plot(user, result):
     response = requests.get(f'{app.api_url}/users/{user}/snapshots')
 
     if response.status_code != 200:
-       return None
+        return None
 
     snaps = json.loads(response.content)
 
@@ -84,24 +84,21 @@ def create_pose_plot(snaps):
 
     fig = make_subplots(rows=2, cols=1, specs=[[{'type': 'scene'}], [{'type': 'scene'}]])
 
-    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='translation', marker=
-        dict(size=6,
-            color=t,
-            colorscale='Viridis',
-            opacity=0.8)),
-        row=1, col=1)
+    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers',
+                               name='translation',
+                               marker=dict(size=6, color=t,
+                                           colorscale='Viridis', opacity=0.8)),
+                               row=1, col=1)
 
     w = [p['rotation']['w'] for p in poses]
     x = [p['rotation']['x'] for p in poses]
     y = [p['rotation']['y'] for p in poses]
     z = [p['rotation']['z'] for p in poses]
 
-    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='rotation', marker=
-        dict(size=6,
-            color=w,
-            colorscale='Viridis',
-            opacity=0.8)),
-        row=2, col=1)
+    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='rotation',
+                               marker=dict(size=6, color=w,
+                                           colorscale='Viridis', opacity=0.8)),
+                  row=2, col=1)
 
     fig.update_layout(height=700, showlegend=False)
 
@@ -120,6 +117,9 @@ def create_color_image_plot(snaps):
 
         data = json.loads(response.content)
         data['timestamp'] = snap['timestamp']
+        api_domain = urlparse(app.api_url).netloc
+        domain = urlparse(request.url).netloc
+        data['data_url'] = data['data_url'].replace(api_domain, domain)
         images.append(data)
 
     return json.dumps(images)
@@ -136,6 +136,9 @@ def create_depth_image_plot(snaps):
 
         data = json.loads(response.content)
         data['timestamp'] = snap['timestamp']
+        api_domain = urlparse(app.api_url).netloc
+        domain = urlparse(request.url).netloc
+        data['data_url'] = data['data_url'].replace(api_domain, domain)
         images.append(data)
 
     return json.dumps(images)
@@ -163,6 +166,13 @@ def user(user_id):
 
     bar = create_plot(user_id, 'feelings')
     return render_template('user.html', plot=bar, user=user)
+
+
+@app.route('/users/<user_id>/snapshots/<int:snapshot_id>/<result_name>/data', methods=['GET'])
+def data(user_id, snapshot_id, result_name):
+    res = requests.get(f'{app.api_url}/users/{user_id}/snapshots/{snapshot_id}/{result_name}/data')
+
+    return res.content
 
 
 @app.route('/users/<user_id>/result')

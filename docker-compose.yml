@@ -60,6 +60,12 @@ services:
             - mongo
         entrypoint: "python -m neuron.api run-server -H 0.0.0.0 -d mongodb://mongo:27017"
 
+    gui:
+        <<: *neuron-service
+        ports:
+            - "8080:8080"
+        entrypoint: "python -m neuron.gui run-server -h 0.0.0.0 -H api"
+
 volumes:
     raw:
     data:
