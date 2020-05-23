@@ -96,9 +96,12 @@ class MongoDriver:
 
     def upsert_snapshot(self, user_id, snapshot_timestamp, ty, result):
         snapshots = self.client.db.snapshots
-        snapshots.find_one_and_update({'timestamp': snapshot_timestamp},
+        snapshot = snapshots.find_one_and_update({'timestamp': snapshot_timestamp},
                 {'$set': {'user_id': user_id, 'timestamp': snapshot_timestamp}},
                 upsert=True)
+
+        if snapshot and 'results' in snapshot and any(ty in res for res in snapshot['results']):
+            return
 
         result = {ty: result}
         snapshots.update({'timestamp': snapshot_timestamp}, {'$push': {'results': result}})

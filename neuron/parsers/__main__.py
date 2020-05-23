@@ -58,6 +58,9 @@ def command_run_parser(parser, msgqueue_url):
             snapshot = json.loads(body)
             res = parse(parser, snapshot)
 
+            if res is None:
+                continue
+
             msg = json.dumps(res)
             channel.basic_publish(exchange=_RESULTS_EXCHANGE, routing_key=parser, body=msg)
         except Exception:

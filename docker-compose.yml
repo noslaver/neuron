@@ -22,7 +22,7 @@ services:
             - "8000:8000"
         depends_on:
             - rabbit
-        entrypoint: "python -m neuron.server run-server rabbitmq://rabbit:5672"
+        entrypoint: "python -m neuron.server run-server -H 0.0.0.0 rabbitmq://rabbit:5672"
 
     parser-pose:
         <<: *neuron-service
@@ -38,12 +38,12 @@ services:
         <<: *neuron-service
         depends_on:
             - rabbit
-        entrypoint: "python -m neuron.parsers run-parser depth-image rabbitmq://rabbit:5672"
+        entrypoint: "python -m neuron.parsers run-parser depth_image rabbitmq://rabbit:5672"
     parser-color-image:
         <<: *neuron-service
         depends_on:
             - rabbit
-        entrypoint: "python -m neuron.parsers run-parser color-image rabbitmq://rabbit:5672"
+        entrypoint: "python -m neuron.parsers run-parser color_image rabbitmq://rabbit:5672"
 
     saver:
         <<: *neuron-service
@@ -58,7 +58,7 @@ services:
             - "5000:5000"
         depends_on:
             - mongo
-        entrypoint: "python -m neuron.api run-server -d mongodb://mongo:27017"
+        entrypoint: "python -m neuron.api run-server -H 0.0.0.0 -d mongodb://mongo:27017"
 
 volumes:
     raw:
