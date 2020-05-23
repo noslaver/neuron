@@ -203,3 +203,25 @@ $ python -m cortex.cli get-snapshot 42 1575446890088 pose
 ```
 
 ### GUI
+
+neuron's GUI visualizes the API.
+
+API usage:
+```python
+from cortex.gui import run_server
+run_api_server(
+    host = '127.0.0.1',
+    port = 8080,
+    api_host = '127.0.0.1',
+    api_port = 5000,
+)
+```
+
+CLI usage:
+```bash
+$ python -m cortex.gui run-server \
+    -h/--host '127.0.0.1' \
+    -p/--port 8080 \
+    -H/--api-host '127.0.0.1' \
+    -P/--api-port 5000
+```
