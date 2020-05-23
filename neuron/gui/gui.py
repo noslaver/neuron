@@ -19,17 +19,15 @@ def create_plot(user, result):
 
     snaps = json.loads(response.content)
 
-    data = None
+    plot = None
     if result == 'pose':
-        data = create_pose_plot(snaps)
+        plot = create_pose_plot(snaps)
     if result == 'feelings':
-        data = create_feelings_plot(snaps)
+        plot = create_feelings_plot(snaps)
     if result == 'color_image':
-        data = create_color_image_plot(snaps)
+        plot = create_color_image_plot(snaps)
     if result == 'depth_image':
-        data = create_depth_image_plot(snaps)
-
-    plot = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+        plot = create_depth_image_plot(snaps)
 
     return plot
 
@@ -62,7 +60,8 @@ def create_feelings_plot(snaps):
 
     fig.update_layout(width=1000, height=700)
 
-    return fig
+    plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return plot
 
 
 def create_pose_plot(snaps):
@@ -106,7 +105,8 @@ def create_pose_plot(snaps):
 
     fig.update_layout(height=700, showlegend=False)
 
-    return fig
+    plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return plot
 
 
 def create_color_image_plot(snaps):
@@ -122,30 +122,23 @@ def create_color_image_plot(snaps):
         data['timestamp'] = snap['timestamp']
         images.append(data)
 
-    fig = make_subplots(rows=2, cols=1, specs=[[{'type': 'scene'}], [{'type': 'scene'}]])
+    return json.dumps(images)
 
-    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='translation', marker=
-        dict(size=6,
-            color=t,
-            colorscale='Viridis',
-            opacity=0.8)),
-        row=1, col=1)
 
-    w = [p['rotation']['w'] for p in poses]
-    x = [p['rotation']['x'] for p in poses]
-    y = [p['rotation']['y'] for p in poses]
-    z = [p['rotation']['z'] for p in poses]
+def create_depth_image_plot(snaps):
+    images = []
+    for snap in snaps:
+        response = requests.get(
+                f'{app.api_url}/users/{snap["user_id"]}/snapshots/{snap["timestamp"]}/depth_image')
 
-    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='rotation', marker=
-        dict(size=6,
-            color=w,
-            colorscale='Viridis',
-            opacity=0.8)),
-        row=2, col=1)
+        if response.status_code != 200:
+            continue
 
-    fig.update_layout(height=700, showlegend=False)
+        data = json.loads(response.content)
+        data['timestamp'] = snap['timestamp']
+        images.append(data)
 
-    return fig
+    return json.dumps(images)
 
 
 @app.route('/')
