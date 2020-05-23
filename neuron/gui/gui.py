@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template, request, url_for
 
+import datetime as dt
 import json
 import numpy as np
 import plotly
@@ -45,7 +46,7 @@ def create_feelings_plot(snaps):
         data['timestamp'] = snap['timestamp']
         feelings.append(data)
 
-    x = [f['timestamp'] for f in feelings]
+    x = [dt.datetime.utcfromtimestamp(f['timestamp'] / 1000.0) for f in feelings]
     y1 = [f['happiness'] for f in feelings]
     y2 = [f['thirst'] for f in feelings]
     y3 = [f['exhaustion'] for f in feelings]
