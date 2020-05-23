@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Neuron - Brain-Computer Interface</title>
+    <script src="{{ url_for("static",filename="js/jquery-3.5.1.min.js") }}"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for("static", filename="images/brain.jpg") }}" width="30" height="30" alt="">
+        </a>
+    </nav>
+    <div class="jumbotron">
+    <h1 class="display-4">Neuron - Brain-Computer Interface</h1>
+        <p class="lead">Unleash your brain.</p>
+    </div>
+    </div>
+    <div class="container">
+        <table class="table table-striped table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>id</th>
+                    <th>name</th>
+                <tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr onclick="window.location='users/{{ user.id }}'">
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
