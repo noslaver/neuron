@@ -6,58 +6,47 @@ x-neuron-service: &neuron-service
         context: .
         dockerfile: Dockerfile
     restart: on-failure
+    volumes:
+        - raw:/app/raw
+        - data:/app/data
 
 services:
     rabbit:
         image: rabbitmq:alpine
-        ports:
-            - 15672:15672
     mongo:
         image: mongo
 
     server:
         <<: *neuron-service
         ports:
-            - 8000:8000
+            - "8000:8000"
         depends_on:
             - rabbit
-        volumes:
-            - raw:/raw
         entrypoint: "python -m neuron.server run-server rabbitmq://rabbit:5672"
 
     parser-pose:
         <<: *neuron-service
-        volumes:
-            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser pose rabbitmq://rabbit:5672"
     parser-feelings:
         <<: *neuron-service
-        volumes:
-            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser feelings rabbitmq://rabbit:5672"
     parser-depth-image:
         <<: *neuron-service
-        volumes:
-            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser depth-image rabbitmq://rabbit:5672"
     parser-color-image:
         <<: *neuron-service
-        volumes:
-            - data:/data
         depends_on:
             - rabbit
         entrypoint: "python -m neuron.parsers run-parser color-image rabbitmq://rabbit:5672"
 
     saver:
         <<: *neuron-service
-        volumes:
-            - data:/data
         depends_on:
             - rabbit
             - mongo
@@ -66,9 +55,8 @@ services:
     api:
         <<: *neuron-service
         ports:
-            - 5000:5000
+            - "5000:5000"
         depends_on:
-            - rabbit
             - mongo
         entrypoint: "python -m neuron.api run-server -d mongodb://mongo:27017"
 
