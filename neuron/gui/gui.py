@@ -4,6 +4,7 @@ import json
 import numpy as np
 import plotly
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
 import requests
 
 
@@ -59,6 +60,91 @@ def create_feelings_plot(snaps):
     fig.add_trace(go.Scatter(x=x, y=y3, mode='lines', name='exhaustion'))
     fig.add_trace(go.Scatter(x=x, y=y4, mode='lines', name='hunger'))
 
+    fig.update_layout(width=1000, height=700)
+
+    return fig
+
+
+def create_pose_plot(snaps):
+    poses = []
+    for snap in snaps:
+        response = requests.get(
+                f'{app.api_url}/users/{snap["user_id"]}/snapshots/{snap["timestamp"]}/pose')
+
+        if response.status_code != 200:
+            continue
+
+        data = json.loads(response.content)
+        data['timestamp'] = snap['timestamp']
+        poses.append(data)
+
+    t = [p['timestamp'] for p in poses]
+    x = [p['translation']['x'] for p in poses]
+    y = [p['translation']['y'] for p in poses]
+    z = [p['translation']['z'] for p in poses]
+
+    fig = make_subplots(rows=2, cols=1, specs=[[{'type': 'scene'}], [{'type': 'scene'}]])
+
+    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='translation', marker=
+        dict(size=6,
+            color=t,
+            colorscale='Viridis',
+            opacity=0.8)),
+        row=1, col=1)
+
+    w = [p['rotation']['w'] for p in poses]
+    x = [p['rotation']['x'] for p in poses]
+    y = [p['rotation']['y'] for p in poses]
+    z = [p['rotation']['z'] for p in poses]
+
+    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='rotation', marker=
+        dict(size=6,
+            color=w,
+            colorscale='Viridis',
+            opacity=0.8)),
+        row=2, col=1)
+
+    fig.update_layout(height=700, showlegend=False)
+
+    return fig
+
+
+def create_color_image_plot(snaps):
+    images = []
+    for snap in snaps:
+        response = requests.get(
+                f'{app.api_url}/users/{snap["user_id"]}/snapshots/{snap["timestamp"]}/color_image')
+
+        if response.status_code != 200:
+            continue
+
+        data = json.loads(response.content)
+        data['timestamp'] = snap['timestamp']
+        images.append(data)
+
+    fig = make_subplots(rows=2, cols=1, specs=[[{'type': 'scene'}], [{'type': 'scene'}]])
+
+    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='translation', marker=
+        dict(size=6,
+            color=t,
+            colorscale='Viridis',
+            opacity=0.8)),
+        row=1, col=1)
+
+    w = [p['rotation']['w'] for p in poses]
+    x = [p['rotation']['x'] for p in poses]
+    y = [p['rotation']['y'] for p in poses]
+    z = [p['rotation']['z'] for p in poses]
+
+    fig.add_trace(go.Scatter3d(x=x, y=y, z=z, mode='markers', name='rotation', marker=
+        dict(size=6,
+            color=w,
+            colorscale='Viridis',
+            opacity=0.8)),
+        row=2, col=1)
+
+    fig.update_layout(height=700, showlegend=False)
+
     return fig
 
 
@@ -86,10 +172,10 @@ def user(user_id):
     return render_template('user.html', plot=bar, user=user)
 
 
-@app.route('/result')
-def change_features():
-    feature = request.args['selected']
-    plot = create_plot(feature)
+@app.route('/users/<user_id>/result')
+def change_features(user_id):
+    result = request.args['selected']
+    plot = create_plot(user_id, result)
     return plot
 
 

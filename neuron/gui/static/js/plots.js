@@ -1,6 +1,7 @@
 $("#type-select").on("change",() => {
+    url = window.location.href
     $.ajax({
-        url: "/result",
+        url: `${url}/result`,
         type: "GET",
         contentType: "application/json;charset=UTF-8",
         data: {
